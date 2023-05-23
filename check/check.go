@@ -10,21 +10,23 @@ import (
 )
 
 // True returns true if x == true, otherwise marks the test as failed and returns false.
-func True(t common.T, x bool, args ...any) bool {
+func True(t common.T, x bool) bool {
 	t.Helper()
-	if !x {
-		common.Fail(t, "expected true", args...)
+	if x {
+		return true
 	}
-	return x
+	t.Error("expected true")
+	return false
 }
 
 // False returns true if x == false, otherwise marks the test as failed and returns false.
-func False(t common.T, x bool, args ...any) bool {
+func False(t common.T, x bool) bool {
 	t.Helper()
-	if x {
-		common.Fail(t, "expected false", args...)
+	if !x {
+		return true
 	}
-	return !x
+	t.Error("expected false")
+	return false
 }
 
 // Equal returns true if want == got, otherwise marks the test as failed and returns false.
@@ -33,16 +35,15 @@ func False(t common.T, x bool, args ...any) bool {
 // of the same type to be compared. Most of the time, this is the
 // equality-checking method that you want.
 //
-// For more information on how this check is implemented, see
-// [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
-func Equal[Type any](t common.T, want Type, got Type, args ...any) bool {
+// You can change the behavior of the equality checking using the go-cmp/cmp
+// Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
+func Equal[Type any](t common.T, want Type, got Type, opts ...cmp.Option) bool {
 	t.Helper()
-	diff := cmp.Diff(want, got)
+	diff := cmp.Diff(want, got, opts...)
 	if diff == "" {
 		return true
 	}
-	msg := fmt.Sprintf("expected want == got\n--- want\n+++ got\n%s", diff)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected want == got\n--- want\n+++ got\n%s", diff))
 	return false
 }
 
@@ -54,14 +55,15 @@ func Equal[Type any](t common.T, want Type, got Type, args ...any) bool {
 // > (booleans, numbers, strings, pointers, channels, arrays of comparable types,
 // structs whose fields are all comparable types).
 //
-// For "deep" or "semantic" equal comparison based on `go-cmp`, use [Equal].
-func StrictEqual[Type comparable](t common.T, want Type, got Type, args ...any) bool {
+// This means that you cannot use StrictEqual on `map` or `slice` types.
+// Instead, and for all other "deep" or "semantic" equality comparisons via
+// `go-cmp`, use [Equal].
+func StrictEqual[Type comparable](t common.T, want Type, got Type) bool {
 	t.Helper()
 	if want == got {
 		return true
 	}
-	msg := fmt.Sprintf("expected want == got\n--- want\n+++ got\n- %+v\n+ %+v\n", want, got)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected want == got\n--- want\n+++ got\n- %+v\n+ %+v\n", want, got))
 	return false
 }
 
@@ -71,15 +73,14 @@ func StrictEqual[Type comparable](t common.T, want Type, got Type, args ...any) 
 // of the same type to be compared. Most of the time, this is the
 // inequality-checking method that you want.
 //
-// For more information on how this check is implemented, see
-// [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
-func NotEqual[Type any](t common.T, want Type, got Type, args ...any) bool {
+// You can change the behavior of the equality checking using the go-cmp/cmp
+// Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
+func NotEqual[Type any](t common.T, want Type, got Type, opts ...cmp.Option) bool {
 	t.Helper()
-	if !cmp.Equal(want, got) {
+	if !cmp.Equal(want, got, opts...) {
 		return true
 	}
-	msg := fmt.Sprintf("expected want != got\nwant: %+v\ngot: %+v", want, got)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected want != got\nwant: %+v\ngot: %+v", want, got))
 	return false
 }
 
@@ -91,79 +92,74 @@ func NotEqual[Type any](t common.T, want Type, got Type, args ...any) bool {
 // > (booleans, numbers, strings, pointers, channels, arrays of comparable types,
 // structs whose fields are all comparable types).
 //
-// For "deep" or "semantic" equal comparison based on `go-cmp`, use [NotEqual].
-func StrictNotEqual[Type comparable](t common.T, want Type, got Type, args ...any) bool {
+// This means that you cannot use StrictNotEqual on `map` or `slice` types.
+// Instead, and for all other "deep" or "semantic" equality comparisons via
+// `go-cmp`, use [NotEqual].
+func StrictNotEqual[Type comparable](t common.T, want Type, got Type) bool {
 	t.Helper()
 	if want != got {
 		return true
 	}
-	msg := fmt.Sprintf("expected want != got\n%+v", want)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected want != got\n%+v", want))
 	return false
 }
 
 // LessThan returns true if small < big, otherwise marks the test as failed and returns false.
-func LessThan[Type constraints.Ordered](t common.T, small Type, big Type, args ...any) bool {
+func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) bool {
 	t.Helper()
 	if small < big {
 		return true
 	}
-	msg := fmt.Sprintf("expected %v < %v", small, big)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected %v < %v", small, big))
 	return false
 }
 
 // LessThanOrEquals returns true if small <= big, otherwise marks the test as failed and returns false.
-func LessThanOrEquals[Type constraints.Ordered](t common.T, small Type, big Type, args ...any) bool {
+func LessThanOrEquals[Type constraints.Ordered](t common.T, small Type, big Type) bool {
 	t.Helper()
 	if small <= big {
 		return true
 	}
-	msg := fmt.Sprintf("expected %v <= %v", small, big)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected %v <= %v", small, big))
 	return false
 }
 
 // GreaterThan returns true if big > small, otherwise marks the test as failed and returns false.
-func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type, args ...any) bool {
+func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) bool {
 	t.Helper()
 	if big > small {
 		return true
 	}
-	msg := fmt.Sprintf("expected %v > %v", big, small)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected %v > %v", big, small))
 	return false
 }
 
 // GreaterThanOrEquals returns true if big >= small, otherwise marks the test as failed and returns false.
-func GreaterThanOrEquals[Type constraints.Ordered](t common.T, big Type, small Type, args ...any) bool {
+func GreaterThanOrEquals[Type constraints.Ordered](t common.T, big Type, small Type) bool {
 	t.Helper()
 	if big >= small {
 		return true
 	}
-	msg := fmt.Sprintf("expected %v >= %v", big, small)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected %v >= %v", big, small))
 	return false
 }
 
 // Error returns true if err != nil, otherwise marks the test as failed and returns false.
-func Error(t common.T, err error, args ...any) bool {
+func Error(t common.T, err error) bool {
 	t.Helper()
 	if err != nil {
 		return true
 	}
-	msg := "expected error, received <nil>"
-	common.Fail(t, msg, args...)
+	t.Error("expected error, received <nil>")
 	return false
 }
 
 // Nil returns true if err == nil, otherwise marks the test as failed and returns false.
-func Nil(t common.T, err error, args ...any) bool {
+func Nil(t common.T, err error) bool {
 	t.Helper()
 	if err == nil {
 		return true
 	}
-	msg := fmt.Sprintf("expected <nil> error, received %v", err)
-	common.Fail(t, msg, args...)
+	t.Error(fmt.Sprintf("expected <nil> error, received %v", err))
 	return false
 }

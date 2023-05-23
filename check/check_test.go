@@ -7,42 +7,13 @@ import (
 
 	"github.com/peterldowns/testy/assert"
 	"github.com/peterldowns/testy/check"
+	"github.com/peterldowns/testy/common"
 )
-
-type mockT struct {
-	failed    bool
-	failednow bool
-}
-
-func (t *mockT) Failed() bool {
-	return t.failed
-}
-
-func (t *mockT) Fail() {
-	t.failed = true
-}
-
-func (t *mockT) FailNow() {
-	t.Fail()
-	t.failednow = true
-}
-
-func (t *mockT) Log(_ ...any) {
-	// no-op
-}
-
-func (t *mockT) Error(_ ...any) {
-	t.Fail()
-}
-
-func (t *mockT) Helper() {
-	// no-op
-}
 
 func TestTrue(t *testing.T) {
 	check.True(t, true)
 
-	mt := &mockT{}
+	mt := &common.MockT{}
 	check.True(mt, false)
 	check.True(t, mt.Failed())
 }
@@ -50,7 +21,7 @@ func TestTrue(t *testing.T) {
 func TestFalse(t *testing.T) {
 	check.False(t, false)
 
-	mt := &mockT{}
+	mt := &common.MockT{}
 	check.True(mt, true)
 	check.True(mt, mt.Failed())
 }
@@ -68,28 +39,28 @@ func TestEnforcePassesIfNoFailures(t *testing.T) {
 func TestEnforceDetectsNonCheckFailures(t *testing.T) {
 	// Enforce() should call FailNow() even if the failure
 	// on the test was reported by a different framework.
-	mt := &mockT{}
+	mt := &common.MockT{}
 	mt.Error("something went wrong")
 	assert.NoErrors(mt)
-	check.True(t, mt.failednow)
+	check.True(t, mt.FailedNow())
 }
 
 func TestEnforceCallsFailedNow(t *testing.T) {
 	// Initially, the test hasn't failed, so Enforce() doesn't call FailNow()
-	mt := &mockT{}
+	mt := &common.MockT{}
 	check.False(t, mt.Failed())
 	assert.NoErrors(mt)
-	check.False(t, mt.failednow)
+	check.False(t, mt.FailedNow())
 
 	// Now cause the test to fail.
 	check.True(mt, false)
 	check.True(t, mt.Failed())
-	check.False(t, mt.failednow)
+	check.False(t, mt.FailedNow())
 
 	// Enforce() should have called FailNow()
 	assert.NoErrors(mt)
 	check.True(t, mt.Failed())
-	check.True(t, mt.failednow)
+	check.True(t, mt.FailedNow())
 }
 
 func TestEnforceCallsThunks(t *testing.T) {
@@ -134,7 +105,7 @@ func TestEnforceNestsJustFine(t *testing.T) {
 }
 
 func TestEnforce(t *testing.T) {
-	mt := &mockT{}
+	mt := &common.MockT{}
 	_, err := dummyAdd(1, 2)
 	check.Nil(mt, err) // passes
 	_, err2 := dummyAdd(1, 0)
@@ -173,7 +144,7 @@ func TestEqual(t *testing.T) {
 	}}
 	johan := person{Name: "peter", Age: 29, Data: map[string]any{}}
 
-	check.NotEqual(t, peter, johan, "whatever")
+	check.NotEqual(t, peter, johan)
 	// check.Equal(t, peter, johan)
 
 	check.True(t, true)

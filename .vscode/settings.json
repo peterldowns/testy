@@ -28,7 +28,10 @@
     "buildFlags": ["-tags", "manual"],
     "formatting.gofumpt": true,
     "formatting.local": "github.com/peterldowns/check",
-    "build.directoryFilters": []
+    "build.directoryFilters": [
+      "-.toolchain",
+      "-.direnv"
+    ]
   },
   "[go]": {
     "editor.formatOnSave": true
