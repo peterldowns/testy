@@ -26,6 +26,7 @@ import (
     "github.com/peterldowns/testy/check"
     "github.com/peterldowns/testy/assert"
 )
+
 func TestExample(t *testing.T) {
     // If a given check fails, the test will be marked as failed but continue
     // executing.  All failures are reported when the test stops executing,
@@ -57,6 +58,13 @@ func TestExample(t *testing.T) {
     assert.Error(t, fmt.Errorf("oh no!")
     assert.Nil(t, nil)
 }
+```
+
+## install
+
+```shell
+go get github.com/peterldowns/testy/check@latest
+go get github.com/peterldowns/testy/assert@latest
 ```
 
 ## motivation
