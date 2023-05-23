@@ -3,7 +3,7 @@ linters-settings:
     disabled-checks:
       - ifElseChain
   goimports:
-    local-prefixes: github.com/peterldowns/check
+    local-prefixes: github.com/peterldowns/testy
   govet:
     enable-all: true
     disable:

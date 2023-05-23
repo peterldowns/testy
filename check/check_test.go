@@ -3,8 +3,10 @@ package check_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
-	"github.com/peterldowns/check"
+	"github.com/peterldowns/testy/assert"
+	"github.com/peterldowns/testy/check"
 )
 
 type mockT struct {
@@ -25,8 +27,16 @@ func (t *mockT) FailNow() {
 	t.failednow = true
 }
 
+func (t *mockT) Log(_ ...any) {
+	// no-op
+}
+
 func (t *mockT) Error(_ ...any) {
 	t.Fail()
+}
+
+func (t *mockT) Helper() {
+	// no-op
 }
 
 func TestTrue(t *testing.T) {
@@ -47,12 +57,12 @@ func TestFalse(t *testing.T) {
 
 func TestEnforcePassesIfNoFailures(t *testing.T) {
 	// Enforce() should pass on a brand new *testing.T
-	check.Enforce(t)
+	assert.NoErrors(t)
 
 	// Enforce() should pass on a test that has only had successful assertions
 	check.True(t, 2 == 1+1)
 	check.False(t, 2 == 1-9)
-	check.Enforce(t)
+	assert.NoErrors(t)
 }
 
 func TestEnforceDetectsNonCheckFailures(t *testing.T) {
@@ -60,7 +70,7 @@ func TestEnforceDetectsNonCheckFailures(t *testing.T) {
 	// on the test was reported by a different framework.
 	mt := &mockT{}
 	mt.Error("something went wrong")
-	check.Enforce(mt)
+	assert.NoErrors(mt)
 	check.True(t, mt.failednow)
 }
 
@@ -68,7 +78,7 @@ func TestEnforceCallsFailedNow(t *testing.T) {
 	// Initially, the test hasn't failed, so Enforce() doesn't call FailNow()
 	mt := &mockT{}
 	check.False(t, mt.Failed())
-	check.Enforce(mt)
+	assert.NoErrors(mt)
 	check.False(t, mt.failednow)
 
 	// Now cause the test to fail.
@@ -77,13 +87,13 @@ func TestEnforceCallsFailedNow(t *testing.T) {
 	check.False(t, mt.failednow)
 
 	// Enforce() should have called FailNow()
-	check.Enforce(mt)
+	assert.NoErrors(mt)
 	check.True(t, mt.Failed())
 	check.True(t, mt.failednow)
 }
 
 func TestEnforceCallsThunks(t *testing.T) {
-	check.Enforce(t, func() error {
+	assert.NoErrors(t, func() error {
 		// Enforce() allows easily calling other functions and asserting
 		// no error, with the same error checking patterns that you use in
 		// the rest of your non-test code.
@@ -108,14 +118,14 @@ func TestEnforceCallsThunks(t *testing.T) {
 func TestEnforceNestsJustFine(t *testing.T) {
 	// Enforce() allows nesting, so you can stage your tests as you'd like
 	// if it helps you make the test more readable.
-	check.Enforce(t)
-	check.Enforce(t, func() error {
+	assert.NoErrors(t)
+	assert.NoErrors(t, func() error {
 		check.True(t, true)
 		check.False(t, false)
-		check.Enforce(t)
+		assert.NoErrors(t)
 
-		check.Enforce(t, func() error {
-			check.NoError(t, nil)
+		assert.NoErrors(t, func() error {
+			check.Nil(t, nil)
 			return nil
 		})
 
@@ -126,10 +136,10 @@ func TestEnforceNestsJustFine(t *testing.T) {
 func TestEnforce(t *testing.T) {
 	mt := &mockT{}
 	_, err := dummyAdd(1, 2)
-	check.NoError(mt, err) // passes
+	check.Nil(mt, err) // passes
 	_, err2 := dummyAdd(1, 0)
-	check.NoError(mt, err2) // fails!
-	check.Enforce(mt, func() error {
+	check.Nil(mt, err2) // fails!
+	assert.NoErrors(mt, func() error {
 		// This code should not be reached because of the earlier failure.
 		t.Fatal("should not have been reached")
 		return nil
@@ -141,4 +151,46 @@ func dummyAdd(a, b int) (int, error) {
 		return 0, fmt.Errorf("cannot calculate with zero")
 	}
 	return a + b, nil
+}
+
+func TestError(t *testing.T) {
+	var err error
+	check.Nil(t, err)
+	check.Nil(t, err)
+	err = fmt.Errorf("example")
+	check.Error(t, err)
+}
+
+type person struct {
+	Name string
+	Age  int
+	Data map[string]any
+}
+
+func TestEqual(t *testing.T) {
+	peter := person{Name: "peter", Age: 29, Data: map[string]any{
+		"foo": "bar",
+	}}
+	johan := person{Name: "peter", Age: 29, Data: map[string]any{}}
+
+	check.NotEqual(t, peter, johan, "whatever")
+	// check.Equal(t, peter, johan)
+
+	check.True(t, true)
+
+	t1 := time.Now()
+	t2 := t1.UTC()
+	check.Equal(t, t1, t2)
+	if check.Equal(t, t1, t2) {
+		t.Log("I knew it")
+	} else {
+		t.Log("what the fuck?")
+	}
+	// assert.DeepEqual(t, t1, t2)
+
+	// TODO:
+	// assert, require = check.Helpers()
+	// check, assert = check.Helpers()
+	// assert.NoFailures(t)
+	// check.AssertNoFailures(t)
 }

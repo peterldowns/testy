@@ -4,7 +4,7 @@
     "**/.DS_Store": true,
     "**/__debug_bin": true,
     ".go/": true,
-    ".toolchain": true,
+    ".toolchain/": true,
     "bin": true,
     "result": true,
     "tmp": true
@@ -27,7 +27,7 @@
   "gopls": {
     "buildFlags": ["-tags", "manual"],
     "formatting.gofumpt": true,
-    "formatting.local": "github.com/peterldowns/example-nix-vscode-golang",
+    "formatting.local": "github.com/peterldowns/check",
     "build.directoryFilters": []
   },
   "[go]": {

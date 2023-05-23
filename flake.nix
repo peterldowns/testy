@@ -1,5 +1,5 @@
 {
-  description = "check is a library for writing meaningful and readable tests";
+  description = "testy is a library for writing meaningful and readable tests";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
 
