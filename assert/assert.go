@@ -99,10 +99,10 @@ func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) {
 	}
 }
 
-// LessThanOrEquals passes if small <= big, immediately failing the test if not.
-func LessThanOrEquals[Type constraints.Ordered](t common.T, small Type, big Type) {
+// LessThanOrEqual passes if small <= big, immediately failing the test if not.
+func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type) {
 	t.Helper()
-	if !check.LessThanOrEquals(t, small, big) {
+	if !check.LessThanOrEqual(t, small, big) {
 		t.FailNow()
 	}
 }
@@ -115,10 +115,10 @@ func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) {
 	}
 }
 
-// GreaterThanOrEquals passes if big >= small, immediately failing the test if not.
-func GreaterThanOrEquals[Type constraints.Ordered](t common.T, big Type, small Type) {
+// GreaterThanOrEqual passes if big >= small, immediately failing the test if not.
+func GreaterThanOrEqual[Type constraints.Ordered](t common.T, big Type, small Type) {
 	t.Helper()
-	if !check.GreaterThanOrEquals(t, big, small) {
+	if !check.GreaterThanOrEqual(t, big, small) {
 		t.FailNow()
 	}
 }

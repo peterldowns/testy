@@ -114,8 +114,8 @@ func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) bool {
 	return false
 }
 
-// LessThanOrEquals returns true if small <= big, otherwise marks the test as failed and returns false.
-func LessThanOrEquals[Type constraints.Ordered](t common.T, small Type, big Type) bool {
+// LessThanOrEqual returns true if small <= big, otherwise marks the test as failed and returns false.
+func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type) bool {
 	t.Helper()
 	if small <= big {
 		return true
@@ -134,8 +134,8 @@ func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) boo
 	return false
 }
 
-// GreaterThanOrEquals returns true if big >= small, otherwise marks the test as failed and returns false.
-func GreaterThanOrEquals[Type constraints.Ordered](t common.T, big Type, small Type) bool {
+// GreaterThanOrEqual returns true if big >= small, otherwise marks the test as failed and returns false.
+func GreaterThanOrEqual[Type constraints.Ordered](t common.T, big Type, small Type) bool {
 	t.Helper()
 	if big >= small {
 		return true

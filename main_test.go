@@ -35,14 +35,14 @@ func TestStructuringHelpers(t *testing.T) {
 	// This is one way to execute a series of checks
 	// and exit the test if any of them have failed.
 	check.Equal(t, 2, 2)
-	check.LessThanOrEquals(t, 2, 3)
+	check.LessThanOrEqual(t, 2, 3)
 	check.GreaterThan(t, 3, 1)
 	assert.NoFailures(t)
 
 	// This is another, equivalent, way to do the same thing
 	assert.NoFailures(t, func() error {
 		check.Equal(t, 2, 2)
-		check.LessThanOrEquals(t, 2, 3)
+		check.LessThanOrEqual(t, 2, 3)
 		check.GreaterThan(t, 3, 1)
 		return nil
 	})
