@@ -1,9 +1,3 @@
-🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧
-
-> **Warning**
-> Under Construction, Work In Progress
-
-🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧 🚧
 
 # 😤 Testy
 
@@ -60,14 +54,23 @@ func TestExample(t *testing.T) {
 }
 ```
 
-## install
+## Install
 
 ```shell
 go get github.com/peterldowns/testy/check@latest
 go get github.com/peterldowns/testy/assert@latest
 ```
 
-## motivation
+## Documentation
+- [This page, https://github.com/peterldowns/testy](https://github.com/peterldowns/testy)
+- [The go.dev docs, pkg.go.dev/github.com/peterldowns/testy](https://pkg.go.dev/github.com/peterldowns/testy)
+
+This page is the primary source for documentation. The code itself is supposed
+to be well-organized, and each function has a meaningful docstring, so you
+should be able to explore it quite easily using an LSP plugin, reading the code,
+or clicking through the go.dev docs. 
+
+## Motivation
 Testy helps you write more usable, readable, and meaningful tests. By allowing
 you to determine between *checks* (soft assertions) and *asserts* (hard
 assertions), and providing structuring helpers, you can make debugging much
@@ -77,6 +80,7 @@ Testy attempts to strike a balance between allowing explicit and meaningful
 tests, encouraging standard golang coding conventions, avoiding implementation
 magic, and minimizing the number of check methods to choose between when writing
 tests.  Here's everything you need to know:
+
 ## `check`
 `check` contains methods for checking a condition, marking a test failed if
 the condition is not met.  This is a "soft" style assert, equivalent to the
@@ -112,7 +116,7 @@ func TestExample(t *testing.T) {
 }
 ```
 
-## methods
+## Methods
 The following methods are available on both `check` and `assert`:
 
 - `True(t, x)` checks if its argument is `true`
@@ -129,7 +133,7 @@ The following methods are available on both `check` and `assert`:
 - `Nil(t, err)` checks if `err == nil`
 
 
-## structuring helpers
+## Structuring Helpers
 The `assert` package also provides helpers for structuring your tests and making them more expressive. You can use these helpers to determine which checks are run in parallel, and which checks should halt test execution.
 
 - `assert.NoFailures(t)` will instantly fail the test if any previous `check` has failed,
@@ -180,14 +184,13 @@ func TestStructuringHelpers(t *testing.T) {
 }
 ```
 
-## more examples
+## More Examples
 
-Beyond the examples presented in this README, see `main_test.go` for additional examples.
-
+Beyond the examples presented in this README, see `main_test.go`.
 
 # FAQ
 
-## why create this library? aren't the existing libraries way better and more polished?
+## Why create this library?
 Each of the existing libraries (testify, gotest.tools, is) are phenomenal projects and Testy
 has been deeply influenced by each of them, and could not exist without them. While writing Testy, I used those libraries as reference, and I have great respect for their authors and contributors.
 
@@ -201,8 +204,12 @@ That said, these libraries are (in my opinion) too limited in terms of expressiv
     - some of which should never be changed without a big discussion
 - they are guard-rails to prevent accidental changes
 
-Most tests are run and refactored many, many more times than they are written. I believe that
-means we should primarily write tests to serve their readers and future users. Testy is an improvement over testify/gotest.tools/is in the following ways:
+Testy is designed to make it easier to write tests, so that more get written. Because Testy has more
+expressive power, the tests you write are easier to read. It makes it possible to write tests that
+express things you cannot express with these other libraries, improving your ability to write tests
+that serve as documentation. And the tests become easier to debug, and therefore more useful.
+
+Explicitly, Testy is an improvement over testify/gotest.tools/is in the following ways:
 
 - `testify`
     - Has a massive surface area, so many methods make it confusing to know which one to use
@@ -217,8 +224,11 @@ means we should primarily write tests to serve their readers and future users. T
     - Missing common and useful methods like `NotEqual`.
     - Magic implementation using ast-walking to determine comment messages is very cool but hard to understand
 
+Only Testy is typesafe and able to perform both soft and hard style assertions,
+with a reasonable API surface area, with `go-cmp`-powered deep equality by
+default.
 
-## why not add more helper methods like testify?
+## Why not add more helper methods like testify?
 When I was working on a real-life, multi-year, multi-developer project,
 I regularly heard that testify was confusing because it wasn't clear which
 methods to use when writing a test. I did some grepping/analysis, and found that
@@ -227,7 +237,7 @@ most tests were easily expressed using `Error/NoError`, `Equal/NotEqual`,
 Testy handles all of these cases gracefully with a much reduced surface area.
 Hopefully this means it is easier to learn and use.
 
-## what should I do if I rely on testify methods that aren't present here?
+## What should I do if I rely on testify methods that aren't present here?
 First off, sorry, I know they do make life more convenient. My recommendation is
 you should change how your test is expressed, or reimplement the helper method
 yourself.
@@ -240,7 +250,7 @@ That said, I could be convinced to create a big library of these, like
 `gotest.tools` has done, if enough people think that's the move. Let me know by
 opening up an issue/PR or contacting me via email.
 
-## i wrote custom test helpers like you recommended, but now they show up in the testing output and ruin the stacktrace. how can i avoid this?
+## I wrote custom test helpers like you recommended, but now they show up in the testing output and ruin the stacktrace. How can I avoid this?
 In any testing helpers you create, just call `t.Helper()` to exclude them from the stacktrace. This is what Testy does (look at the code!)
 
 ```go
@@ -250,13 +260,13 @@ func myTestHelper(t *testing.T, otherArgs ...any) {
 }
 ```
 
-## why use `go-cmp` instead of `reflect.DeepEquals`?
+## Why use `go-cmp` instead of `reflect.DeepEquals`?
 There were a bunch of github issues about it being better, and in general it seems to give developers more control over how the comparison is implemented, including which fields to include/ignore. This seems to make a big difference particularly when comparing `time.Time` objects. For more information, see these discussions:
 
 - https://github.com/stretchr/testify/issues/535
 - https://github.com/matryer/is/issues/53
 
-## how did you decide on "check" and "assert"?
+## How did you decide on "check" and "assert"?
 
 Most languages have an "assert" concept that halts program execution if the
 condition being asserted fails. So it makes sense to me to call them asserts.
@@ -265,3 +275,18 @@ Not many languages have the ability to easily perform soft asserts. One of the n
 things about Go is that it does, with the `t.Fail()`/`t.Error()` methods of its builtin `testing` library/framework/tool. There is no one name that everyone uses for this, but "check" makes sense to me and it's also used by `gotest.tools`.
 
 `testify`.... ugh! It actually did the most, in my opinion, to popularize the use of both soft and hard style asserts. But it calls the soft style "asserts" and the hard style "requires". Their minds! What were they thinking! 😤
+
+## How can I contribute?
+
+Testy is a standard golang project, you'll need a working golang environment.
+If you're of the nix persuasion, this repo comes with a flakes-compatible
+development shell that you can enter with `nix develop` (flakes) or `nix-shell`
+(standard).
+
+If you use VSCode, the repo comes with suggested extensions and settings.
+
+Testing and linting scripts are defined with Just, see the Justfile to see how
+to run those commands manually. There are also Github Actions that will lint and test
+your PRs.
+
+Contributions are more than welcome!
