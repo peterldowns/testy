@@ -17,40 +17,43 @@ Major features:
 package example_test
 
 import (
+    "fmt"
+    "testing"
+
     "github.com/peterldowns/testy/check"
     "github.com/peterldowns/testy/assert"
 )
 
 func TestExample(t *testing.T) {
-    // If a given check fails, the test will be marked as failed but continue
-    // executing.  All failures are reported when the test stops executing,
-    // either at the end of the test or when someone calls t.FailNow().
-    check.True(t, true)
-    check.False(t, false)
-    check.Equal(t, []string{"hello"}, []string{"hello"})
-    check.StrictEqual(t, "hello", "hello")
-    check.NotEqual(t, map[string]int{"hello": 1}, nil)
-    check.StrictNotEqual(t, 5, 0)
-    check.LessThan(t, 1, 4)
-    check.LessThanOrEquals(t, 4, 4)
-    check.GreaterThan(t, 8, 6)
-    check.GreaterThanOrequals(t, 6, 6)
-    check.Error(t, fmt.Errorf("oh no!")
-    check.Nil(t, nil)
-    // If a given assert fails, the test will immediately be marked as failed
-    // stop executing, and report all failures.
-    assert.True(t, true)
-    assert.False(t, false)
-    assert.Equal(t, []string{"hello"}, []string{"hello"})
-    assert.StrictEqual(t, "hello", "hello")
-    assert.NotEqual(t, map[string]int{"hello": 1}, nil)
-    assert.StrictNotEqual(t, 5, 0)
-    assert.LessThan(t, 1, 4)
-    assert.LessThanOrEquals(t, 4, 4)
-    assert.GreaterThan(t, 8, 6)
-    assert.GreaterThanOrequals(t, 6, 6)
-    assert.Error(t, fmt.Errorf("oh no!")
-    assert.Nil(t, nil)
+  // If a given check fails, the test will be marked as failed but continue
+  // executing.  All failures are reported when the test stops executing,
+  // either at the end of the test or when someone calls t.FailNow().
+  check.True(t, true)
+  check.False(t, false)
+  check.Equal(t, []string{"hello"}, []string{"hello"})
+  check.StrictEqual(t, "hello", "hello")
+  check.NotEqual(t, map[string]int{"hello": 1}, nil)
+  check.StrictNotEqual(t, 5, 0)
+  check.LessThan(t, 1, 4)
+  check.LessThanOrEqual(t, 4, 4)
+  check.GreaterThan(t, 8, 6)
+  check.GreaterThanOrEqual(t, 6, 6)
+  check.Error(t, fmt.Errorf("oh no"))
+  check.Nil(t, nil)
+  // If a given assert fails, the test will immediately be marked as failed
+  // stop executing, and report all failures.
+  assert.True(t, true)
+  assert.False(t, false)
+  assert.Equal(t, []string{"hello"}, []string{"hello"})
+  assert.StrictEqual(t, "hello", "hello")
+  assert.NotEqual(t, map[string]int{"hello": 1}, nil)
+  assert.StrictNotEqual(t, 5, 0)
+  assert.LessThan(t, 1, 4)
+  assert.LessThanOrEqual(t, 4, 4)
+  assert.GreaterThan(t, 8, 6)
+  assert.GreaterThanOrEqual(t, 6, 6)
+  assert.Error(t, fmt.Errorf("oh no"))
+  assert.Nil(t, nil)
 }
 ```
 
