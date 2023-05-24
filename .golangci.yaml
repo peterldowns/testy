@@ -104,6 +104,7 @@ linters:
     - unparam
     - unused
     - whitespace
+    - paralleltest
 issues:
   exclude:
     # Allow shadowing of `err` because it's so common

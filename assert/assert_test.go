@@ -353,6 +353,7 @@ func TestStrictNotEqual(t *testing.T) {
 func TestLess(t *testing.T) {
 	t.Parallel()
 	t.Run("float", func(t *testing.T) {
+		t.Parallel()
 		assert.LessThan(t, 1.0, 2.0)
 		assert.LessThanOrEqual(t, 1.0, 2.0)
 		assert.LessThanOrEqual(t, 1.0, 1.0)
@@ -368,6 +369,7 @@ func TestLess(t *testing.T) {
 		check.True(t, mt.FailedNow())
 	})
 	t.Run("int", func(t *testing.T) {
+		t.Parallel()
 		assert.LessThan(t, 1, 2)
 		assert.LessThanOrEqual(t, 1, 2)
 		assert.LessThanOrEqual(t, 1, 1)
@@ -383,6 +385,7 @@ func TestLess(t *testing.T) {
 		check.True(t, mt.FailedNow())
 	})
 	t.Run("string", func(t *testing.T) {
+		t.Parallel()
 		assert.LessThan(t, "aaa", "bbb")
 		assert.LessThanOrEqual(t, "aaa", "bbb")
 		assert.LessThanOrEqual(t, "aaa", "aaa")
@@ -398,6 +401,7 @@ func TestLess(t *testing.T) {
 		check.True(t, mt.FailedNow())
 	})
 	t.Run("rune", func(t *testing.T) {
+		t.Parallel()
 		assert.LessThan(t, 'a', 'b')
 		assert.LessThanOrEqual(t, 'a', 'b')
 		assert.LessThanOrEqual(t, 'a', 'a')
@@ -417,6 +421,7 @@ func TestLess(t *testing.T) {
 func TestGreater(t *testing.T) {
 	t.Parallel()
 	t.Run("float", func(t *testing.T) {
+		t.Parallel()
 		assert.GreaterThan(t, 2.0, 1.0)
 		assert.GreaterThanOrEqual(t, 2.0, 1.0)
 		assert.GreaterThanOrEqual(t, 2.0, 2.0)
@@ -432,6 +437,7 @@ func TestGreater(t *testing.T) {
 		check.True(t, mt.FailedNow())
 	})
 	t.Run("int", func(t *testing.T) {
+		t.Parallel()
 		assert.GreaterThan(t, 2, 1)
 		assert.GreaterThanOrEqual(t, 2, 1)
 		assert.GreaterThanOrEqual(t, 1, 1)
@@ -447,6 +453,7 @@ func TestGreater(t *testing.T) {
 		check.True(t, mt.FailedNow())
 	})
 	t.Run("string", func(t *testing.T) {
+		t.Parallel()
 		assert.GreaterThan(t, "bbb", "aaa")
 		assert.GreaterThanOrEqual(t, "bbb", "aaa")
 		assert.GreaterThanOrEqual(t, "bbb", "bbb")
@@ -462,6 +469,7 @@ func TestGreater(t *testing.T) {
 		check.True(t, mt.FailedNow())
 	})
 	t.Run("rune", func(t *testing.T) {
+		t.Parallel()
 		assert.GreaterThan(t, 'b', 'a')
 		assert.GreaterThanOrEqual(t, 'b', 'a')
 		assert.GreaterThanOrEqual(t, 'b', 'b')
@@ -479,7 +487,9 @@ func TestGreater(t *testing.T) {
 }
 
 func TestError(t *testing.T) {
+	t.Parallel()
 	t.Run("error", func(t *testing.T) {
+		t.Parallel()
 		assert.Error(t, fmt.Errorf("new error"))
 
 		mt := &common.MockT{}
@@ -488,6 +498,7 @@ func TestError(t *testing.T) {
 		check.True(t, mt.FailedNow())
 	})
 	t.Run("nil", func(t *testing.T) {
+		t.Parallel()
 		assert.Nil(t, nil)
 
 		mt := &common.MockT{}

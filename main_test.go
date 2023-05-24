@@ -15,6 +15,7 @@ type person struct {
 }
 
 func TestEquality(t *testing.T) {
+	t.Parallel()
 	// These structs are not equal under deep or strict equality, they are
 	// simply different.
 	peter := &person{Name: "peter", Age: int32(29)}
@@ -32,6 +33,7 @@ func TestEquality(t *testing.T) {
 }
 
 func TestStructuringHelpers(t *testing.T) {
+	t.Parallel()
 	// This is one way to execute a series of checks
 	// and exit the test if any of them have failed.
 	check.Equal(t, 2, 2)
@@ -93,6 +95,7 @@ func myHelper(a, b int) (int, error) {
 // inference handles everything correctly. Because this is so common, you can
 // also use Nil and Error as shorthand.
 func TestErrorComparisons(t *testing.T) {
+	t.Parallel()
 	var x error
 	check.Equal(t, nil, x)
 	x = fmt.Errorf("something went wrong")
@@ -107,6 +110,7 @@ func TestErrorComparisons(t *testing.T) {
 // You can use Equal and NotEqual to check if a pointer is valid or nil,
 // and type inference handles everything correctly.
 func TestPointerComparisons(t *testing.T) {
+	t.Parallel()
 	y := "hello"
 	var x *string
 	check.Equal(t, nil, x)
@@ -115,6 +119,7 @@ func TestPointerComparisons(t *testing.T) {
 }
 
 func TestExample(t *testing.T) {
+	t.Parallel()
 	// If a given check fails, the test will be marked as failed but continue
 	// executing.  All failures are reported when the test stops executing,
 	// either at the end of the test or when someone calls t.FailNow().

@@ -17,6 +17,7 @@ func dummyAdd(a, b int) (int, error) {
 }
 
 func TestNoFailuresPasses(t *testing.T) {
+	t.Parallel()
 	// NoFailures() should pass on a brand new *testing.T
 	assert.NoFailures(t)
 
@@ -27,6 +28,7 @@ func TestNoFailuresPasses(t *testing.T) {
 }
 
 func TestNoErrorsPasses(t *testing.T) {
+	t.Parallel()
 	// NoErrors() should pass on a brand new *testing.T
 	assert.NoErrors(t)
 
@@ -37,6 +39,7 @@ func TestNoErrorsPasses(t *testing.T) {
 }
 
 func TestNoFailuresDetectsNonCheckFailures(t *testing.T) {
+	t.Parallel()
 	// NoFailures() should call FailNow() even if the failure
 	// on the test was reported by a different framework.
 	mt := &common.MockT{}
@@ -46,6 +49,7 @@ func TestNoFailuresDetectsNonCheckFailures(t *testing.T) {
 }
 
 func TestNoErrorsDetectsNonCheckFailures(t *testing.T) {
+	t.Parallel()
 	// NoErrors() should call FailNow() even if the failure
 	// on the test was reported by a different framework.
 	mt := &common.MockT{}
@@ -55,6 +59,7 @@ func TestNoErrorsDetectsNonCheckFailures(t *testing.T) {
 }
 
 func TestNoFailuresCallsFailedNow(t *testing.T) {
+	t.Parallel()
 	// Initially, the test hasn't failed, so NoFailures() doesn't call FailNow()
 	mt := &common.MockT{}
 	check.False(t, mt.Failed())
@@ -73,6 +78,7 @@ func TestNoFailuresCallsFailedNow(t *testing.T) {
 }
 
 func TestNoErrorsCallsFailedNow(t *testing.T) {
+	t.Parallel()
 	// Initially, the test hasn't failed, so NoErrors() doesn't call FailNow()
 	mt := &common.MockT{}
 	check.False(t, mt.Failed())
@@ -172,6 +178,7 @@ func TestNoErrorsCallsThunks(t *testing.T) {
 }
 
 func TestNoErrorsNestsJustFine(t *testing.T) {
+	t.Parallel()
 	// NoErrors() allows nesting, so you can stage your tests as you'd like
 	// if it helps you make the test more readable.
 	assert.NoErrors(t)
