@@ -40,11 +40,10 @@ func TestStructuringHelpers(t *testing.T) {
 	assert.NoFailures(t)
 
 	// This is another, equivalent, way to do the same thing
-	assert.NoFailures(t, func() error {
+	assert.NoFailures(t, func() {
 		check.Equal(t, 2, 2)
 		check.LessThanOrEqual(t, 2, 3)
 		check.GreaterThan(t, 3, 1)
-		return nil
 	})
 
 	// This is a way to execute a series of checks

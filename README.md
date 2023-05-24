@@ -10,7 +10,7 @@ Major features:
   rather than requiring you to run the test suite.
 - Deep equality testing by default using [go-cmp](https://github.com/google/go-cmp), which
   means it works just like you'd expect, and gives you optional control if you want something different.
-- Soft (calls `t.Fail()`) and hard (calls `t.FailNow()`) versions of every check method gives full control over which checks are run, in which stages, during your tests.
+- Soft *check* and hard *assert* versions of every check method gives you full control over which checks are run, in which stages, during your tests.
 - Additional nice-to-have helpers for structuring tests in more readable ways.
 
 ```go
@@ -25,36 +25,37 @@ import (
 )
 
 func TestExample(t *testing.T) {
-  // If a given check fails, the test will be marked as failed but continue
-  // executing.  All failures are reported when the test stops executing,
-  // either at the end of the test or when someone calls t.FailNow().
-  check.True(t, true)
-  check.False(t, false)
-  check.Equal(t, []string{"hello"}, []string{"hello"})
-  check.StrictEqual(t, "hello", "hello")
-  check.NotEqual(t, map[string]int{"hello": 1}, nil)
-  check.StrictNotEqual(t, 5, 0)
-  check.LessThan(t, 1, 4)
-  check.LessThanOrEqual(t, 4, 4)
-  check.GreaterThan(t, 8, 6)
-  check.GreaterThanOrEqual(t, 6, 6)
-  check.Error(t, fmt.Errorf("oh no"))
-  check.Nil(t, nil)
-  // If a given assert fails, the test will immediately be marked as failed
-  // stop executing, and report all failures.
-  assert.True(t, true)
-  assert.False(t, false)
-  assert.Equal(t, []string{"hello"}, []string{"hello"})
-  assert.StrictEqual(t, "hello", "hello")
-  assert.NotEqual(t, map[string]int{"hello": 1}, nil)
-  assert.StrictNotEqual(t, 5, 0)
-  assert.LessThan(t, 1, 4)
-  assert.LessThanOrEqual(t, 4, 4)
-  assert.GreaterThan(t, 8, 6)
-  assert.GreaterThanOrEqual(t, 6, 6)
-  assert.Error(t, fmt.Errorf("oh no"))
-  assert.Nil(t, nil)
+	// If a given check fails, the test will be marked as failed but continue
+	// executing.  All failures are reported when the test stops executing,
+	// either at the end of the test or when someone calls t.FailNow().
+	check.True(t, true)
+	check.False(t, false)
+	check.Equal(t, []string{"hello"}, []string{"hello"})
+	check.StrictEqual(t, "hello", "hello")
+	check.NotEqual(t, map[string]int{"hello": 1}, nil)
+	check.StrictNotEqual(t, 5, 0)
+	check.LessThan(t, 1, 4)
+	check.LessThanOrEqual(t, 4, 4)
+	check.GreaterThan(t, 8, 6)
+	check.GreaterThanOrEqual(t, 6, 6)
+	check.Error(t, fmt.Errorf("oh no"))
+	check.Nil(t, nil)
+	// If a given assert fails, the test will immediately be marked as failed
+	// stop executing, and report all failures.
+	assert.True(t, true)
+	assert.False(t, false)
+	assert.Equal(t, []string{"hello"}, []string{"hello"})
+	assert.StrictEqual(t, "hello", "hello")
+	assert.NotEqual(t, map[string]int{"hello": 1}, nil)
+	assert.StrictNotEqual(t, 5, 0)
+	assert.LessThan(t, 1, 4)
+	assert.LessThanOrEqual(t, 4, 4)
+	assert.GreaterThan(t, 8, 6)
+	assert.GreaterThanOrEqual(t, 6, 6)
+	assert.Error(t, fmt.Errorf("oh no"))
+	assert.Nil(t, nil)
 }
+
 ```
 
 ## Install
@@ -98,7 +99,7 @@ func TestExample(t *testing.T) {
     f, err = ServiceThatGetsAFoo()
     // f is only meaningful if err == nil
     if check.Nil(t, err) {
-        check.Equals(f.Name, "peter")
+        check.Equal(f.Name, "peter")
     }
 }
 ```
@@ -115,7 +116,7 @@ func TestExample(t *testing.T) {
     var err error
     f, err = ServiceThatGetsAFoo()
     assert.Nil(t, err) // if err != nil, the test will end here
-    assert.Equals(f.Name, "peter")
+    assert.Equal(f.Name, "peter")
 }
 ```
 
@@ -129,9 +130,9 @@ The following methods are available on both `check` and `assert`:
 - `NotEqual(t, want, got)` checks if its arguments are not equal using [go-cmp](https://github.com/google/go-cmp)
 - `StrictNotEqual(t, want, got)` checks if its arguments are not equal using `!=`
 - `LessThan(t, small, big)` checks if `small < big`
-- `LessThanOrEquals(t, small, big)` checks if `small <= big`
+- `LessThanOrEqual(t, small, big)` checks if `small <= big`
 - `GreaterThan(t, big, small)` checks if `big > small`
-- `GreaterThanOrEquals(t, big, small)` checks if `big >= small`
+- `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
 - `Error(t, err)` checks if `err != nil`
 - `Nil(t, err)` checks if `err == nil`
 
@@ -139,15 +140,12 @@ The following methods are available on both `check` and `assert`:
 ## Structuring Helpers
 The `assert` package also provides helpers for structuring your tests and making them more expressive. You can use these helpers to determine which checks are run in parallel, and which checks should halt test execution.
 
-- `assert.NoFailures(t)` will instantly fail the test if any previous `check` has failed,
+- `assert.NoFailures(t)` and `assert.NoErrors(t)` will instantly fail the test if any previous `check` has failed,
 or any other code has called `t.Fail()`/`t.Error()` for any reason.
-- `assert.NoFailures(t, thunk...(func() error))` will do the following:
-    - for each thunk:
-        - fail immediately if any previous `check` has failed.
-        - execute the thunk
-        - fail immediately if the thunk returns a non-nil error
-    - fail immediately if check has failed
-- `assert.NoErrors == assert.Group == assert.NoFailures` &mdash; pick the name that makes most sense in context.
+- `assert.NoFailures(t, thunks...(func()))` will run each thunk function. After each thunk, it will check that no failures have occurred. If they have, the test immediately exits without running any of the following thunks.
+- `assert.NoErrors(t, thunks...(func() error))` will run each thunk function. If the thunk returns an error, or any check failure has occurred, the test immediately exits without running any of the following thunks.
+
+You can use these to stage your tests and make them more useful.
 
 ```go
 func TestStructuringHelpers(t *testing.T) {
@@ -161,11 +159,10 @@ func TestStructuringHelpers(t *testing.T) {
     assert.NoFailures(t)
 
     // This is another, equivalent, way to express the same logic
-    assert.Group(t, func() error {
+    assert.NoFailures(t, func() {
         check.Equal(t, 2, 2)
         check.LessThanOrEquals(t, 2, 3)
         check.GreaterThan(t, 3, 1)
-        return nil
     })
 
     // You can also use the helpers to adopt a standard error-returning style
@@ -207,12 +204,9 @@ That said, these libraries are (in my opinion) too limited in terms of expressiv
     - some of which should never be changed without a big discussion
 - they are guard-rails to prevent accidental changes
 
-Testy is designed to make it easier to write tests, so that more get written. Because Testy has more
-expressive power, the tests you write are easier to read. It makes it possible to write tests that
-express things you cannot express with these other libraries, improving your ability to write tests
-that serve as documentation. And the tests become easier to debug, and therefore more useful.
+Testy is designed to make it easier to write tests for all of these different purposes. By making it easier to write tests, more tests get written. By giving the author more control over when to halt the test (checks vs. asserts, structuring helpers), debugging failing tests becomes easier.
 
-Explicitly, Testy is an improvement over testify/gotest.tools/is in the following ways:
+Explicitly, these other libraries have the following problems:
 
 - `testify`
     - Has a massive surface area, so many methods make it confusing to know which one to use
@@ -236,8 +230,8 @@ When I was working on a real-life, multi-year, multi-developer project,
 I regularly heard that testify was confusing because it wasn't clear which
 methods to use when writing a test. I did some grepping/analysis, and found that
 most tests were easily expressed using `Error/NoError`, `Equal/NotEqual`,
-`True/False`, `Nil/NotNil`, `Error/NoError`, `Zero/NotZero`, `Empty/NotEmpty`.
-Testy handles all of these cases gracefully with a much reduced surface area.
+`True/False`, `Nil/NotNil`, `Zero/NotZero`, `Empty/NotEmpty`.
+Testy handles all of these cases gracefully with a much reduced API surface area.
 Hopefully this means it is easier to learn and use.
 
 ## What should I do if I rely on testify methods that aren't present here?

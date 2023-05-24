@@ -5,163 +5,493 @@ import (
 	"testing"
 	"time"
 
-	"github.com/peterldowns/testy/assert"
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/peterldowns/testy/check"
 	"github.com/peterldowns/testy/common"
 )
 
 func TestTrue(t *testing.T) {
+	t.Parallel()
 	check.True(t, true)
 
 	mt := &common.MockT{}
 	check.True(mt, false)
 	check.True(t, mt.Failed())
+	check.False(t, mt.FailedNow())
 }
 
 func TestFalse(t *testing.T) {
+	t.Parallel()
 	check.False(t, false)
 
 	mt := &common.MockT{}
-	check.True(mt, true)
-	check.True(mt, mt.Failed())
-}
-
-func TestEnforcePassesIfNoFailures(t *testing.T) {
-	// Enforce() should pass on a brand new *testing.T
-	assert.NoErrors(t)
-
-	// Enforce() should pass on a test that has only had successful assertions
-	check.True(t, 2 == 1+1)
-	check.False(t, 2 == 1-9)
-	assert.NoErrors(t)
-}
-
-func TestEnforceDetectsNonCheckFailures(t *testing.T) {
-	// Enforce() should call FailNow() even if the failure
-	// on the test was reported by a different framework.
-	mt := &common.MockT{}
-	mt.Error("something went wrong")
-	assert.NoErrors(mt)
-	check.True(t, mt.FailedNow())
-}
-
-func TestEnforceCallsFailedNow(t *testing.T) {
-	// Initially, the test hasn't failed, so Enforce() doesn't call FailNow()
-	mt := &common.MockT{}
-	check.False(t, mt.Failed())
-	assert.NoErrors(mt)
-	check.False(t, mt.FailedNow())
-
-	// Now cause the test to fail.
-	check.True(mt, false)
+	check.False(mt, true)
 	check.True(t, mt.Failed())
 	check.False(t, mt.FailedNow())
-
-	// Enforce() should have called FailNow()
-	assert.NoErrors(mt)
-	check.True(t, mt.Failed())
-	check.True(t, mt.FailedNow())
-}
-
-func TestEnforceCallsThunks(t *testing.T) {
-	assert.NoErrors(t, func() error {
-		// Enforce() allows easily calling other functions and asserting
-		// no error, with the same error checking patterns that you use in
-		// the rest of your non-test code.
-		if _, err := dummyAdd(1, 2); err != nil {
-			return err
-		}
-		// Enforce() allows the use of the standard error checking
-		// pattern instead of using NoError()
-		res, err := dummyAdd(-1, 1)
-		if err != nil {
-			return err
-		}
-		check.True(t, 0 == res)
-
-		if 1 == 2 {
-			return fmt.Errorf("math has gone insane today")
-		}
-		return nil
-	})
-}
-
-func TestEnforceNestsJustFine(t *testing.T) {
-	// Enforce() allows nesting, so you can stage your tests as you'd like
-	// if it helps you make the test more readable.
-	assert.NoErrors(t)
-	assert.NoErrors(t, func() error {
-		check.True(t, true)
-		check.False(t, false)
-		assert.NoErrors(t)
-
-		assert.NoErrors(t, func() error {
-			check.Nil(t, nil)
-			return nil
-		})
-
-		return nil
-	})
-}
-
-func TestEnforce(t *testing.T) {
-	mt := &common.MockT{}
-	_, err := dummyAdd(1, 2)
-	check.Nil(mt, err) // passes
-	_, err2 := dummyAdd(1, 0)
-	check.Nil(mt, err2) // fails!
-	assert.NoErrors(mt, func() error {
-		// This code should not be reached because of the earlier failure.
-		t.Fatal("should not have been reached")
-		return nil
-	})
-}
-
-func dummyAdd(a, b int) (int, error) {
-	if a == 0 || b == 0 {
-		return 0, fmt.Errorf("cannot calculate with zero")
-	}
-	return a + b, nil
-}
-
-func TestError(t *testing.T) {
-	var err error
-	check.Nil(t, err)
-	check.Nil(t, err)
-	err = fmt.Errorf("example")
-	check.Error(t, err)
 }
 
 type person struct {
 	Name string
-	Age  int
-	Data map[string]any
+}
+
+type hiddenPerson struct {
+	Name string
+	// When using Equal / NotEqual, this unexported field will require a custom
+	// cmp.Option.
+	hidden bool
 }
 
 func TestEqual(t *testing.T) {
-	peter := person{Name: "peter", Age: 29, Data: map[string]any{
-		"foo": "bar",
-	}}
-	johan := person{Name: "peter", Age: 29, Data: map[string]any{}}
+	t.Parallel()
 
-	check.NotEqual(t, peter, johan)
-	// check.Equal(t, peter, johan)
+	t.Run("ints", func(t *testing.T) {
+		t.Parallel()
+		check.Equal(t, 1, 1)
 
-	check.True(t, true)
+		mt := &common.MockT{}
+		check.Equal(mt, 1, 2)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("slices", func(t *testing.T) {
+		t.Parallel()
+		emptySlice := []string{}
+		check.Equal(t, emptySlice, emptySlice)
 
-	t1 := time.Now()
-	t2 := t1.UTC()
-	check.Equal(t, t1, t2)
-	if check.Equal(t, t1, t2) {
-		t.Log("I knew it")
-	} else {
-		t.Log("what the fuck?")
-	}
-	// assert.DeepEqual(t, t1, t2)
+		mt := &common.MockT{}
+		check.Equal(mt, emptySlice, []string{"hello"})
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("custom structs", func(t *testing.T) {
+		t.Parallel()
+		customStruct := person{Name: "peter"}
+		check.Equal(t, customStruct, customStruct)
 
-	// TODO:
-	// assert, require = check.Helpers()
-	// check, assert = check.Helpers()
-	// assert.NoFailures(t)
-	// check.AssertNoFailures(t)
+		mt := &common.MockT{}
+		check.Equal(mt, customStruct, person{Name: "bob"})
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("maps", func(t *testing.T) {
+		t.Parallel()
+		mapdata := map[string]int{
+			"hello":   1,
+			"goodbye": 9,
+		}
+		check.Equal(t, mapdata, mapdata)
+
+		mt := &common.MockT{}
+		check.Equal(mt, mapdata, map[string]int{"hello": 1})
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("hidden struct fields with cmp.opts", func(t *testing.T) {
+		t.Parallel()
+		// Equal works with types that have hidden fields, you just need to use a
+		// cmp.Option.
+		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
+		check.Equal(
+			t,
+			customStructWithHiddenField,
+			customStructWithHiddenField,
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+
+		mt := &common.MockT{}
+		check.Equal(
+			mt,
+			hiddenPerson{Name: "Peter", hidden: true},
+			hiddenPerson{Name: "Peter", hidden: false},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+		t.Parallel()
+		// Shows that a custom .Equal method works -- a time.Time will be .Equal()
+		// to a version of itself in a different timezone, even though the structs
+		// contain strictly different values.
+		timeStruct := time.Now()
+		check.Equal(t, timeStruct, timeStruct.UTC())
+
+		mt := &common.MockT{}
+		check.Equal(
+			mt,
+			timeStruct,
+			timeStruct.Add(1*time.Hour),
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+}
+
+func TestNotEqual(t *testing.T) {
+	t.Parallel()
+
+	t.Run("ints", func(t *testing.T) {
+		t.Parallel()
+		check.NotEqual(t, 1, 2)
+
+		mt := &common.MockT{}
+		check.NotEqual(mt, 1, 1)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("slices", func(t *testing.T) {
+		t.Parallel()
+		check.NotEqual(t, []string{}, []string{"hello"})
+
+		mt := &common.MockT{}
+		emptySlice := []string{}
+		check.NotEqual(mt, emptySlice, emptySlice)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("custom structs", func(t *testing.T) {
+		t.Parallel()
+		check.NotEqual(t, person{Name: "peter"}, person{Name: "bob"})
+
+		mt := &common.MockT{}
+		customStruct := person{Name: "peter"}
+		check.NotEqual(mt, customStruct, customStruct)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("maps", func(t *testing.T) {
+		t.Parallel()
+		mapdata := map[string]int{
+			"hello":   1,
+			"goodbye": 9,
+		}
+		check.NotEqual(t, mapdata, map[string]int{"hello": 1})
+
+		mt := &common.MockT{}
+		check.NotEqual(mt, mapdata, mapdata)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("hidden struct fields with cmp.opts", func(t *testing.T) {
+		t.Parallel()
+		// Equal works with types that have hidden fields, you just need to use a
+		// cmp.Option.
+		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
+		check.NotEqual(
+			t,
+			customStructWithHiddenField,
+			hiddenPerson{Name: "Peter", hidden: false},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+
+		mt := &common.MockT{}
+		check.NotEqual(
+			mt,
+			customStructWithHiddenField,
+			customStructWithHiddenField,
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+		t.Parallel()
+		// Shows that a custom .Equal method works -- a time.Time will be .Equal()
+		// to a version of itself in a different timezone, even though the structs
+		// contain strictly different values.
+		timeStruct := time.Now()
+		check.NotEqual(t, timeStruct, timeStruct.Add(1*time.Hour))
+
+		mt := &common.MockT{}
+		check.NotEqual(
+			mt,
+			timeStruct,
+			timeStruct.UTC(),
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+}
+
+func TestStrictEqual(t *testing.T) {
+	t.Parallel()
+	t.Run("ints", func(t *testing.T) {
+		t.Parallel()
+		check.StrictEqual(t, 1, 1)
+
+		mt := &common.MockT{}
+		check.StrictEqual(mt, 1, 2)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("custom structs", func(t *testing.T) {
+		t.Parallel()
+		customStruct := person{Name: "peter"}
+		check.StrictEqual(t, customStruct, customStruct)
+
+		mt := &common.MockT{}
+		check.StrictEqual(mt, customStruct, person{Name: "bob"})
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("hidden struct fields", func(t *testing.T) {
+		t.Parallel()
+		// Equal works with types that have hidden fields, you just need to use a
+		// cmp.Option.
+		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
+		check.StrictEqual(
+			t,
+			customStructWithHiddenField,
+			customStructWithHiddenField,
+		)
+
+		mt := &common.MockT{}
+		check.StrictEqual(
+			mt,
+			hiddenPerson{Name: "Peter", hidden: true},
+			hiddenPerson{Name: "Peter", hidden: false},
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+		t.Parallel()
+		// While Equal will consider these two structs to be the same
+		// because they .Equal() each other, StrictEqual just does struct
+		// comparison, and will find that they differ.
+		mt := &common.MockT{}
+		timeStruct := time.Now()
+		check.StrictEqual(mt, timeStruct, timeStruct.UTC())
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.StrictEqual(
+			mt,
+			timeStruct,
+			timeStruct.Add(1*time.Hour),
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+}
+
+func TestStrictNotEqual(t *testing.T) {
+	t.Parallel()
+	t.Run("ints", func(t *testing.T) {
+		t.Parallel()
+		check.StrictNotEqual(t, 1, 2)
+
+		mt := &common.MockT{}
+		check.StrictNotEqual(mt, 1, 1)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("custom structs", func(t *testing.T) {
+		t.Parallel()
+		customStruct := person{Name: "peter"}
+		check.StrictNotEqual(t, customStruct, person{Name: "bob"})
+
+		mt := &common.MockT{}
+		check.StrictNotEqual(mt, customStruct, customStruct)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("hidden struct fields", func(t *testing.T) {
+		t.Parallel()
+		// Equal works with types that have hidden fields, you just need to use a
+		// cmp.Option.
+		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
+		check.StrictNotEqual(
+			t,
+			customStructWithHiddenField,
+			hiddenPerson{Name: "Peter", hidden: false},
+		)
+
+		mt := &common.MockT{}
+		check.StrictNotEqual(
+			mt,
+			customStructWithHiddenField,
+			customStructWithHiddenField,
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+		t.Parallel()
+		// While Equal will consider these two structs to be the same
+		// because they .Equal() each other, StrictEqual just does struct
+		// comparison, and will find that they differ.
+		timeStruct := time.Now()
+		check.StrictNotEqual(t, timeStruct, timeStruct.UTC())
+		check.StrictNotEqual(
+			t,
+			timeStruct,
+			timeStruct.Add(1*time.Hour),
+		)
+	})
+}
+
+func TestLess(t *testing.T) {
+	t.Parallel()
+	t.Run("float", func(t *testing.T) {
+		check.LessThan(t, 1.0, 2.0)
+		check.LessThanOrEqual(t, 1.0, 2.0)
+		check.LessThanOrEqual(t, 1.0, 1.0)
+
+		mt := &common.MockT{}
+		check.LessThan(mt, 1.0, 1.0)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.LessThanOrEqual(mt, 2.0, 1.0)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("int", func(t *testing.T) {
+		check.LessThan(t, 1, 2)
+		check.LessThanOrEqual(t, 1, 2)
+		check.LessThanOrEqual(t, 1, 1)
+
+		mt := &common.MockT{}
+		check.LessThan(mt, 1, 1)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.LessThanOrEqual(mt, 2, 1)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("string", func(t *testing.T) {
+		check.LessThan(t, "aaa", "bbb")
+		check.LessThanOrEqual(t, "aaa", "bbb")
+		check.LessThanOrEqual(t, "aaa", "aaa")
+
+		mt := &common.MockT{}
+		check.LessThan(mt, "aaa", "aaa")
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.LessThanOrEqual(mt, "bbb", "aaa")
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("rune", func(t *testing.T) {
+		check.LessThan(t, 'a', 'b')
+		check.LessThanOrEqual(t, 'a', 'b')
+		check.LessThanOrEqual(t, 'a', 'a')
+
+		mt := &common.MockT{}
+		check.LessThan(mt, 'a', 'a')
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.LessThanOrEqual(mt, 'b', 'a')
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+}
+
+func TestGreater(t *testing.T) {
+	t.Parallel()
+	t.Run("float", func(t *testing.T) {
+		check.GreaterThan(t, 2.0, 1.0)
+		check.GreaterThanOrEqual(t, 2.0, 1.0)
+		check.GreaterThanOrEqual(t, 2.0, 2.0)
+
+		mt := &common.MockT{}
+		check.GreaterThan(mt, 2.0, 2.0)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.GreaterThanOrEqual(mt, 1.0, 2.0)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("int", func(t *testing.T) {
+		check.GreaterThan(t, 2, 1)
+		check.GreaterThanOrEqual(t, 2, 1)
+		check.GreaterThanOrEqual(t, 1, 1)
+
+		mt := &common.MockT{}
+		check.GreaterThan(mt, 2, 2)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.GreaterThanOrEqual(mt, 1, 2)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("string", func(t *testing.T) {
+		check.GreaterThan(t, "bbb", "aaa")
+		check.GreaterThanOrEqual(t, "bbb", "aaa")
+		check.GreaterThanOrEqual(t, "bbb", "bbb")
+
+		mt := &common.MockT{}
+		check.GreaterThan(mt, "bbb", "bbb")
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.GreaterThanOrEqual(mt, "aaa", "bbb")
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("rune", func(t *testing.T) {
+		check.GreaterThan(t, 'b', 'a')
+		check.GreaterThanOrEqual(t, 'b', 'a')
+		check.GreaterThanOrEqual(t, 'b', 'b')
+
+		mt := &common.MockT{}
+		check.GreaterThan(mt, 'b', 'b')
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.GreaterThanOrEqual(mt, 'a', 'b')
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+}
+
+func TestError(t *testing.T) {
+	t.Run("error", func(t *testing.T) {
+		check.Error(t, fmt.Errorf("new error"))
+
+		mt := &common.MockT{}
+		check.Error(mt, nil)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("nil", func(t *testing.T) {
+		check.Nil(t, nil)
+
+		mt := &common.MockT{}
+		check.Nil(mt, fmt.Errorf("new error"))
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
 }
