@@ -1,9 +1,12 @@
 package main_test
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/peterldowns/testy/assert"
 	"github.com/peterldowns/testy/check"
@@ -149,4 +152,19 @@ func TestExample(t *testing.T) {
 	assert.GreaterThanOrEqual(t, 6, 6)
 	assert.Error(t, fmt.Errorf("oh no"))
 	assert.Nil(t, nil)
+}
+
+func TestByteEquality(t *testing.T) {
+	t.Parallel()
+	// This is an example from
+	// https://devs.cloudimmunity.com/gotchas-and-common-mistakes-in-go-golang/index.html#compare_struct_arr_slice_map
+	// showing how a go-cmp cmp.Option can be used to control equality behavior.
+	// By default, a nil slice `nil` != an empty but non-nil slice `{}`.  By
+	// passing in a custom equals method `func[T any](a, b T) bool`, go-cmp will
+	// use it. The `bytes.Equal` method is designed to handle exactly this case
+	// and consider both byte slices equal.
+	var b1 []byte
+	b2 := []byte{}
+	check.NotEqual(t, b1, b2)
+	check.Equal(t, b1, b2, cmp.Comparer(bytes.Equal))
 }
