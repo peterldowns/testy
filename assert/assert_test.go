@@ -225,131 +225,6 @@ func TestNotEqual(t *testing.T) {
 	})
 }
 
-func TestStrictEqual(t *testing.T) {
-	t.Parallel()
-	t.Run("ints", func(t *testing.T) {
-		t.Parallel()
-		assert.StrictEqual(t, 1, 1)
-
-		mt := &common.MockT{}
-		assert.StrictEqual(mt, 1, 2)
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-	})
-
-	t.Run("custom structs", func(t *testing.T) {
-		t.Parallel()
-		customStruct := person{Name: "peter"}
-		assert.StrictEqual(t, customStruct, customStruct)
-
-		mt := &common.MockT{}
-		assert.StrictEqual(mt, customStruct, person{Name: "bob"})
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-	})
-
-	t.Run("hidden struct fields", func(t *testing.T) {
-		t.Parallel()
-		// Equal works with types that have hidden fields, you just need to use a
-		// cmp.Option.
-		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
-		assert.StrictEqual(
-			t,
-			customStructWithHiddenField,
-			customStructWithHiddenField,
-		)
-
-		mt := &common.MockT{}
-		assert.StrictEqual(
-			mt,
-			hiddenPerson{Name: "Peter", hidden: true},
-			hiddenPerson{Name: "Peter", hidden: false},
-		)
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-	})
-
-	t.Run("time.time structs with custom .equals", func(t *testing.T) {
-		t.Parallel()
-		// While Equal will consider these two structs to be the same
-		// because they .Equal() each other, StrictEqual just does struct
-		// comparison, and will find that they differ.
-		mt := &common.MockT{}
-		timeStruct := time.Now()
-		assert.StrictEqual(mt, timeStruct, timeStruct.UTC())
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-
-		mt = &common.MockT{}
-		assert.StrictEqual(
-			mt,
-			timeStruct,
-			timeStruct.Add(1*time.Hour),
-		)
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-	})
-}
-
-func TestStrictNotEqual(t *testing.T) {
-	t.Parallel()
-	t.Run("ints", func(t *testing.T) {
-		t.Parallel()
-		assert.StrictNotEqual(t, 1, 2)
-
-		mt := &common.MockT{}
-		assert.StrictNotEqual(mt, 1, 1)
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-	})
-
-	t.Run("custom structs", func(t *testing.T) {
-		t.Parallel()
-		customStruct := person{Name: "peter"}
-		assert.StrictNotEqual(t, customStruct, person{Name: "bob"})
-
-		mt := &common.MockT{}
-		assert.StrictNotEqual(mt, customStruct, customStruct)
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-	})
-
-	t.Run("hidden struct fields", func(t *testing.T) {
-		t.Parallel()
-		// Equal works with types that have hidden fields, you just need to use a
-		// cmp.Option.
-		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
-		assert.StrictNotEqual(
-			t,
-			customStructWithHiddenField,
-			hiddenPerson{Name: "Peter", hidden: false},
-		)
-
-		mt := &common.MockT{}
-		assert.StrictNotEqual(
-			mt,
-			customStructWithHiddenField,
-			customStructWithHiddenField,
-		)
-		check.True(t, mt.Failed())
-		check.True(t, mt.FailedNow())
-	})
-
-	t.Run("time.time structs with custom .equals", func(t *testing.T) {
-		t.Parallel()
-		// While Equal will consider these two structs to be the same
-		// because they .Equal() each other, StrictEqual just does struct
-		// comparison, and will find that they differ.
-		timeStruct := time.Now()
-		assert.StrictNotEqual(t, timeStruct, timeStruct.UTC())
-		assert.StrictNotEqual(
-			t,
-			timeStruct,
-			timeStruct.Add(1*time.Hour),
-		)
-	})
-}
-
 func TestLess(t *testing.T) {
 	t.Parallel()
 	t.Run("float", func(t *testing.T) {
@@ -505,5 +380,175 @@ func TestError(t *testing.T) {
 		assert.Nil(mt, fmt.Errorf("new error"))
 		check.True(t, mt.Failed())
 		check.True(t, mt.FailedNow())
+	})
+}
+
+func TestIn(t *testing.T) {
+	t.Parallel()
+	t.Run("int", func(t *testing.T) {
+		t.Parallel()
+		assert.In(t, 1, []int{1, 2, 3})
+
+		mt := &common.MockT{}
+		assert.In(mt, 1, []int{4, 5, 6})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+	t.Run("nil equality", func(t *testing.T) {
+		t.Parallel()
+		assert.In(t, nil, []interface{}{nil})
+
+		mt := &common.MockT{}
+		assert.In(mt, nil, []interface{}{})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+	t.Run("strings", func(t *testing.T) {
+		t.Parallel()
+		assert.In(t, "world", []string{"hello", "world"})
+
+		mt := &common.MockT{}
+		assert.In(mt, "world", []string{"hello world"})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+	t.Run("hidden struct fields with cmp.opts", func(t *testing.T) {
+		t.Parallel()
+		// Equal works with types that have hidden fields, you just need to use a
+		// cmp.Option.
+		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
+		assert.In(
+			t,
+			customStructWithHiddenField,
+			[]hiddenPerson{
+				customStructWithHiddenField,
+			},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+
+		mt := &common.MockT{}
+		assert.In(
+			mt,
+			hiddenPerson{Name: "Peter", hidden: true},
+			[]hiddenPerson{
+				{Name: "Peter", hidden: false},
+			},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+
+	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+		t.Parallel()
+		t1 := time.Now()
+		t2 := t1.UTC()
+		assert.In(t, &t1, []*time.Time{nil, &t2})
+
+		mt := &common.MockT{}
+		assert.In(
+			mt,
+			t1,
+			[]time.Time{
+				t1.Add(1 * time.Hour),
+			},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+
+	t.Run("empty slice", func(t *testing.T) {
+		t.Parallel()
+		mt := &common.MockT{}
+		assert.In(mt, 1, []int{})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		assert.In(mt, 1, nil)
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+}
+
+func TestNotIn(t *testing.T) {
+	t.Parallel()
+	t.Run("int", func(t *testing.T) {
+		t.Parallel()
+		assert.NotIn(t, 1, []int{4, 5, 6})
+
+		mt := &common.MockT{}
+		assert.NotIn(mt, 1, []int{1, 2, 3})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+	t.Run("nil equality", func(t *testing.T) {
+		t.Parallel()
+		assert.NotIn(t, nil, []interface{}{})
+
+		mt := &common.MockT{}
+		assert.NotIn(mt, nil, []interface{}{nil})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+	t.Run("strings", func(t *testing.T) {
+		t.Parallel()
+		assert.NotIn(t, "world", []string{"hello world"})
+
+		mt := &common.MockT{}
+		assert.NotIn(mt, "world", []string{"hello", "world"})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+	t.Run("hidden struct fields with cmp.opts", func(t *testing.T) {
+		t.Parallel()
+		// Equal works with types that have hidden fields, you just need to use a
+		// cmp.Option.
+		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
+		assert.NotIn(
+			t,
+			hiddenPerson{Name: "Peter", hidden: true},
+			[]hiddenPerson{
+				{Name: "Peter", hidden: false},
+			},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+
+		mt := &common.MockT{}
+		assert.NotIn(
+			mt,
+			customStructWithHiddenField,
+			[]hiddenPerson{
+				customStructWithHiddenField,
+			},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+
+	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+		t.Parallel()
+		t1 := time.Now()
+		assert.NotIn(
+			t,
+			t1,
+			[]time.Time{
+				t1.Add(1 * time.Hour),
+			},
+		)
+
+		mt := &common.MockT{}
+		t2 := t1.UTC()
+		assert.NotIn(mt, t1, []time.Time{t1, t2})
+		check.True(t, mt.Failed())
+		check.True(t, mt.FailedNow())
+	})
+
+	t.Run("empty slice", func(t *testing.T) {
+		t.Parallel()
+		assert.NotIn(t, 1, []int{})
+		assert.NotIn(t, 1, nil)
 	})
 }

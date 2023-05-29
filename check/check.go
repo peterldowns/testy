@@ -47,26 +47,6 @@ func Equal[Type any](t common.T, want Type, got Type, opts ...cmp.Option) bool {
 	return false
 }
 
-// StrictEqual returns true if want == got, otherwise marks the test as failed and returns false.
-//
-// This is a typesafe check that uses the golang == operator to compare its
-// arguments. It may only be used if `want` and `got` are comparable types, defined as
-//
-// > (booleans, numbers, strings, pointers, channels, arrays of comparable types,
-// structs whose fields are all comparable types).
-//
-// This means that you cannot use StrictEqual on `map` or `slice` types.
-// Instead, and for all other "deep" or "semantic" equality comparisons via
-// `go-cmp`, use [Equal].
-func StrictEqual[Type comparable](t common.T, want Type, got Type) bool {
-	t.Helper()
-	if want == got {
-		return true
-	}
-	t.Error(fmt.Sprintf("expected want == got\n--- want\n+++ got\n- %+v\n+ %+v\n", want, got))
-	return false
-}
-
 // NotEqual returns true if want != got, otherwise marks the test as failed and returns false.
 //
 // This is a typesafe check for inequality using go-cmp, allowing arguments only
@@ -80,27 +60,7 @@ func NotEqual[Type any](t common.T, want Type, got Type, opts ...cmp.Option) boo
 	if !cmp.Equal(want, got, opts...) {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected want != got\nwant: %+v\ngot: %+v", want, got))
-	return false
-}
-
-// StrictNotEqual returns true if want != got, otherwise marks the test as failed and returns false.
-//
-// This is a typesafe check that uses the golang == operator to compare its
-// arguments. It may only be used if `want` and `got` are comparable types, defined as
-//
-// > (booleans, numbers, strings, pointers, channels, arrays of comparable types,
-// structs whose fields are all comparable types).
-//
-// This means that you cannot use StrictNotEqual on `map` or `slice` types.
-// Instead, and for all other "deep" or "semantic" equality comparisons via
-// `go-cmp`, use [NotEqual].
-func StrictNotEqual[Type comparable](t common.T, want Type, got Type) bool {
-	t.Helper()
-	if want != got {
-		return true
-	}
-	t.Error(fmt.Sprintf("expected want != got\n%+v", want))
+	t.Error(fmt.Sprintf("expected want != got\nwant: %+v\n got: %+v", want, got))
 	return false
 }
 
@@ -162,4 +122,30 @@ func Nil(t common.T, err error) bool {
 	}
 	t.Error(fmt.Sprintf("expected <nil> error, received %v", err))
 	return false
+}
+
+// In returns true if element is in slice, otherwise marks the test as failed
+// and returns false.
+func In[Type any](t common.T, element Type, slice []Type, opts ...cmp.Option) bool {
+	t.Helper()
+	for _, value := range slice {
+		if cmp.Equal(element, value, opts...) {
+			return true
+		}
+	}
+	t.Error(fmt.Sprintf("expected slice to contain element:\nelement: %+v\n", element))
+	return false
+}
+
+// NotIn returns true if element is not in slice, otherwise marks the test as
+// failed and returns false.
+func NotIn[Type any](t common.T, element Type, slice []Type, opts ...cmp.Option) bool {
+	t.Helper()
+	for _, value := range slice {
+		if cmp.Equal(element, value, opts...) {
+			t.Error(fmt.Sprintf("expected slice to not contain element\nelement: %+v\n  found: %+v", element, value))
+			return false
+		}
+	}
+	return true
 }

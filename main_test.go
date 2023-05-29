@@ -24,7 +24,6 @@ func TestEquality(t *testing.T) {
 	peter := &person{Name: "peter", Age: int32(29)}
 	johan := &person{Name: "johan", Age: int32(28)}
 	assert.NotEqual(t, peter, johan)
-	assert.StrictNotEqual(t, peter, johan)
 
 	// These two Time objects are equal due to the logic in their .Equal()
 	// method, but they are not strictly equal because the structs contain
@@ -32,7 +31,6 @@ func TestEquality(t *testing.T) {
 	t1 := time.Now()
 	t2 := t1.UTC()
 	assert.Equal(t, t1, t2)
-	assert.StrictNotEqual(t, t1, t2)
 }
 
 func TestStructuringHelpers(t *testing.T) {
@@ -129,9 +127,7 @@ func TestExample(t *testing.T) {
 	check.True(t, true)
 	check.False(t, false)
 	check.Equal(t, []string{"hello"}, []string{"hello"})
-	check.StrictEqual(t, "hello", "hello")
 	check.NotEqual(t, map[string]int{"hello": 1}, nil)
-	check.StrictNotEqual(t, 5, 0)
 	check.LessThan(t, 1, 4)
 	check.LessThanOrEqual(t, 4, 4)
 	check.GreaterThan(t, 8, 6)
@@ -143,9 +139,7 @@ func TestExample(t *testing.T) {
 	assert.True(t, true)
 	assert.False(t, false)
 	assert.Equal(t, []string{"hello"}, []string{"hello"})
-	assert.StrictEqual(t, "hello", "hello")
 	assert.NotEqual(t, map[string]int{"hello": 1}, nil)
-	assert.StrictNotEqual(t, 5, 0)
 	assert.LessThan(t, 1, 4)
 	assert.LessThanOrEqual(t, 4, 4)
 	assert.GreaterThan(t, 8, 6)

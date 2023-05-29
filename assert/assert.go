@@ -9,7 +9,7 @@ import (
 	"github.com/peterldowns/testy/common"
 )
 
-// True passes if x == true, immediately failing the test if not.
+// True passes if x == true, otherwise immediately failing the test.
 func True(t common.T, x bool) {
 	t.Helper()
 	if !check.True(t, x) {
@@ -17,7 +17,7 @@ func True(t common.T, x bool) {
 	}
 }
 
-// False passes if x == false, immediately failing the test if not.
+// False passes if x == false, otherwise immediately failing the test.
 func False(t common.T, x bool) {
 	t.Helper()
 	if !check.False(t, x) {
@@ -25,7 +25,7 @@ func False(t common.T, x bool) {
 	}
 }
 
-// Equal passes if want == got, immediately failing the test if not.
+// Equal passes if want == got, otherwise immediately failing the test.
 //
 // This is a typesafe check for inequality using go-cmp, allowing arguments only
 // of the same type to be compared. Most of the time, this is the
@@ -40,25 +40,7 @@ func Equal[Type any](t common.T, want Type, got Type, opts ...cmp.Option) {
 	}
 }
 
-// StrictEqual passes if want == got, immediately failing the test if not.
-//
-// This is a typesafe check that uses the golang == operator to compare its
-// arguments. It may only be used if `want` and `got` are comparable types, defined as
-//
-// > (booleans, numbers, strings, pointers, channels, arrays of comparable types,
-// structs whose fields are all comparable types).
-//
-// This means that you cannot use StrictEqual on `map` or `slice` types.
-// Instead, and for all other "deep" or "semantic" equality comparisons via
-// `go-cmp`, use [Equal].
-func StrictEqual[Type comparable](t common.T, want Type, got Type) {
-	t.Helper()
-	if !check.StrictEqual(t, want, got) {
-		t.FailNow()
-	}
-}
-
-// NotEqual passes if want != got, immediately failing the test if not.
+// NotEqual passes if want != got, otherwise immediately failing the test.
 //
 // This is a typesafe check for inequality using go-cmp, allowing arguments only
 // of the same type to be compared. Most of the time, this is the
@@ -73,25 +55,7 @@ func NotEqual[Type any](t common.T, want Type, got Type, opts ...cmp.Option) {
 	}
 }
 
-// StrictNotEqual passes if want != got, immediately failing the test if not.
-//
-// This is a typesafe check that uses the golang == operator to compare its
-// arguments. It may only be used if `want` and `got` are comparable types, defined as
-//
-// > (booleans, numbers, strings, pointers, channels, arrays of comparable types,
-// structs whose fields are all comparable types).
-//
-// This means that you cannot use StrictNotEqual on `map` or `slice` types.
-// Instead, and for all other "deep" or "semantic" equality comparisons via
-// `go-cmp`, use [NotEqual].
-func StrictNotEqual[Type comparable](t common.T, want Type, got Type) {
-	t.Helper()
-	if !check.StrictNotEqual(t, want, got) {
-		t.FailNow()
-	}
-}
-
-// LessThan passes if small < big, immediately failing the test if not.
+// LessThan passes if small < big, otherwise immediately failing the test.
 func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) {
 	t.Helper()
 	if !check.LessThan(t, small, big) {
@@ -99,7 +63,8 @@ func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) {
 	}
 }
 
-// LessThanOrEqual passes if small <= big, immediately failing the test if not.
+// LessThanOrEqual passes if small <= big, otherwise immediately failing the
+// test.
 func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type) {
 	t.Helper()
 	if !check.LessThanOrEqual(t, small, big) {
@@ -107,7 +72,7 @@ func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type)
 	}
 }
 
-// GreaterThan passes if big > small, immediately failing the test if not.
+// GreaterThan passes if big > small, otherwise immediately failing the test.
 func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) {
 	t.Helper()
 	if !check.GreaterThan(t, big, small) {
@@ -115,7 +80,8 @@ func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) {
 	}
 }
 
-// GreaterThanOrEqual passes if big >= small, immediately failing the test if not.
+// GreaterThanOrEqual passes if big >= small, otherwise immediately failing the
+// test.
 func GreaterThanOrEqual[Type constraints.Ordered](t common.T, big Type, small Type) {
 	t.Helper()
 	if !check.GreaterThanOrEqual(t, big, small) {
@@ -123,7 +89,7 @@ func GreaterThanOrEqual[Type constraints.Ordered](t common.T, big Type, small Ty
 	}
 }
 
-// Error passes if err != nil, immediately failing the test if not.
+// Error passes if err != nil, otherwise immediately failing the test.
 func Error(t common.T, err error) {
 	t.Helper()
 	if !check.Error(t, err) {
@@ -131,10 +97,28 @@ func Error(t common.T, err error) {
 	}
 }
 
-// Nil passes if err == nil, immediately failing the test if not.
+// Nil passes if err == nil, otherwise immediately failing the test.
 func Nil(t common.T, err error) {
 	t.Helper()
 	if !check.Nil(t, err) {
+		t.FailNow()
+	}
+}
+
+// In passes if want is an element of slice, otherwise immediately failing the
+// test.
+func In[Type any](t common.T, want Type, slice []Type, opts ...cmp.Option) {
+	t.Helper()
+	if !check.In(t, want, slice, opts...) {
+		t.FailNow()
+	}
+}
+
+// NotIn passes if want is an not element of slice, otherwise immediately
+// failing the test.
+func NotIn[Type any](t common.T, want Type, slice []Type, opts ...cmp.Option) {
+	t.Helper()
+	if !check.NotIn(t, want, slice, opts...) {
 		t.FailNow()
 	}
 }

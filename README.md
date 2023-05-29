@@ -25,35 +25,36 @@ import (
 )
 
 func TestExample(t *testing.T) {
-	// If a given check fails, the test will be marked as failed but continue
-	// executing.  All failures are reported when the test stops executing,
-	// either at the end of the test or when someone calls t.FailNow().
-	check.True(t, true)
-	check.False(t, false)
-	check.Equal(t, []string{"hello"}, []string{"hello"})
-	check.StrictEqual(t, "hello", "hello")
-	check.NotEqual(t, map[string]int{"hello": 1}, nil)
-	check.StrictNotEqual(t, 5, 0)
-	check.LessThan(t, 1, 4)
-	check.LessThanOrEqual(t, 4, 4)
-	check.GreaterThan(t, 8, 6)
-	check.GreaterThanOrEqual(t, 6, 6)
-	check.Error(t, fmt.Errorf("oh no"))
-	check.Nil(t, nil)
-	// If a given assert fails, the test will immediately be marked as failed
-	// stop executing, and report all failures.
-	assert.True(t, true)
-	assert.False(t, false)
-	assert.Equal(t, []string{"hello"}, []string{"hello"})
-	assert.StrictEqual(t, "hello", "hello")
-	assert.NotEqual(t, map[string]int{"hello": 1}, nil)
-	assert.StrictNotEqual(t, 5, 0)
-	assert.LessThan(t, 1, 4)
-	assert.LessThanOrEqual(t, 4, 4)
-	assert.GreaterThan(t, 8, 6)
-	assert.GreaterThanOrEqual(t, 6, 6)
-	assert.Error(t, fmt.Errorf("oh no"))
-	assert.Nil(t, nil)
+  // If a given check fails, the test will be marked as failed but continue
+  // executing.  All failures are reported when the test stops executing,
+  // either at the end of the test or when someone calls t.FailNow().
+  check.True(t, true)
+  check.False(t, false)
+  check.Equal(t, []string{"hello"}, []string{"hello"})
+  check.NotEqual(t, map[string]int{"hello": 1}, nil)
+  check.LessThan(t, 1, 4)
+  check.LessThanOrEqual(t, 4, 4)
+  check.GreaterThan(t, 8, 6)
+  check.GreaterThanOrEqual(t, 6, 6)
+  check.Error(t, fmt.Errorf("oh no"))
+  check.Nil(t, nil)
+  check.In(t, 4, []int{2, 3, 4, 5})
+  check.NotIn(t, "hello", []string{"goodbye", "world"})
+
+  // If a given assert fails, the test will immediately be marked as failed
+  // stop executing, and report all failures.
+  assert.True(t, true)
+  assert.False(t, false)
+  assert.Equal(t, []string{"hello"}, []string{"hello"})
+  assert.NotEqual(t, map[string]int{"hello": 1}, nil)
+  assert.LessThan(t, 1, 4)
+  assert.LessThanOrEqual(t, 4, 4)
+  assert.GreaterThan(t, 8, 6)
+  assert.GreaterThanOrEqual(t, 6, 6)
+  assert.Error(t, fmt.Errorf("oh no"))
+  assert.Nil(t, nil)
+  assert.In(t, 4, []int{2, 3, 4, 5})
+  assert.NotIn(t, "hello", []string{"goodbye", "world"})
 }
 
 ```
@@ -61,8 +62,7 @@ func TestExample(t *testing.T) {
 ## Install
 
 ```shell
-go get github.com/peterldowns/testy/check@latest
-go get github.com/peterldowns/testy/assert@latest
+go get github.com/peterldowns/testy@latest
 ```
 
 ## Documentation
@@ -126,15 +126,15 @@ The following methods are available on both `check` and `assert`:
 - `True(t, x)` checks if its argument is `true`
 - `False(t, x)` checks if its argument is `false`
 - `Equal(t, want, got)` checks if its arguments are equal using [go-cmp](https://github.com/google/go-cmp)
-- `StrictEqual(t, want, got)` checks if its arguments are equal using `==`
 - `NotEqual(t, want, got)` checks if its arguments are not equal using [go-cmp](https://github.com/google/go-cmp)
-- `StrictNotEqual(t, want, got)` checks if its arguments are not equal using `!=`
 - `LessThan(t, small, big)` checks if `small < big`
 - `LessThanOrEqual(t, small, big)` checks if `small <= big`
 - `GreaterThan(t, big, small)` checks if `big > small`
 - `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
 - `Error(t, err)` checks if `err != nil`
 - `Nil(t, err)` checks if `err == nil`
+- `In(t, item, slice)` checks if `item in slice`
+- `NotIn(t, item, slice)` checks if `item not in slice`
 
 
 ## Structuring Helpers
@@ -154,14 +154,14 @@ func TestStructuringHelpers(t *testing.T) {
     // - at the end, report any failures.
     // - if there were any failures, end the test.
     check.Equal(t, 2, 2)
-    check.LessThanOrEquals(t, 2, 3)
+    check.LessThanOrEqual(t, 2, 3)
     check.GreaterThan(t, 3, 1)
     assert.NoFailures(t)
 
     // This is another, equivalent, way to express the same logic
     assert.NoFailures(t, func() {
         check.Equal(t, 2, 2)
-        check.LessThanOrEquals(t, 2, 3)
+        check.LessThanOrEqual(t, 2, 3)
         check.GreaterThan(t, 3, 1)
     })
 
@@ -235,17 +235,15 @@ Testy handles all of these cases gracefully with a much reduced API surface area
 Hopefully this means it is easier to learn and use.
 
 ## What should I do if I rely on testify methods that aren't present here?
-First off, sorry, I know they do make life more convenient. My recommendation is
-you should change how your test is expressed, or reimplement the helper method
-yourself.
+You have the following options:
 
-Most codebases have their own domain-specific helpers, and this is a Good Thing.
-Tests should be written like normal code, and involve plenty of helper methods
-and functions for making it easy to express your domain specific problems.
-
-That said, I could be convinced to create a big library of these, like
-`gotest.tools` has done, if enough people think that's the move. Let me know by
-opening up an issue/PR or contacting me via email.
+- Rewrite the test to not use those methods. This sounds scary but is often not
+  that hard.
+- Write your own helper method for your specific check. Most codebases have
+  their own test helpers anyway because it makes the tests more fluent to have
+  domain-specific helpers.
+- File an issue or PR to add the helper to this library. I'm open to the idea of
+  adding a few more methods.
 
 ## I wrote custom test helpers like you recommended, but now they show up in the testing output and ruin the stacktrace. How can I avoid this?
 In any testing helpers you create, just call `t.Helper()` to exclude them from the stacktrace. This is what Testy does (look at the code!)
