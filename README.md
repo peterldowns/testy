@@ -6,11 +6,13 @@ Testy is typesafe (using generics), based on [go-cmp](#), and designed as an alt
 to [testify](https://github.com/stretchr/testify), [gotools.test](https://github.com/gotestyourself/gotest.tools), and [is](https://github.com/matryer/is).
 
 Major features:
-- Typesafe, using generics, means that many failures are now caught at compiler time,
+- Typesafe, using generics, means that many failures are now caught at compile time,
   rather than requiring you to run the test suite.
 - Deep equality testing by default using [go-cmp](https://github.com/google/go-cmp), which
-  means it works just like you'd expect, and gives you optional control if you want something different.
-- Soft *check* and hard *assert* versions of every check method gives you full control over which checks are run, in which stages, during your tests.
+  means equality checks work in a sane way by default (even for `time.Time` objects), and optional
+  controls for more complicated situations.
+- Soft *check* (test keeps going) and hard *assert* (test fails instantly) versions of every method
+  gives you full control over which checks are run, in which stages, during your tests.
 - Additional nice-to-have helpers for structuring tests in more readable ways.
 
 ```go
