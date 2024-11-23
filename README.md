@@ -104,8 +104,6 @@ to be well-organized, and each function has a meaningful docstring, so you
 should be able to explore it quite easily using an LSP plugin, reading the code,
 or clicking through the go.dev docs. 
 
-## Motivation
-
 ## `check` methods call `t.Error`
 `check` contains methods for checking a condition, marking the test as failed
 but allowing it to continue running if the condition is not met.  This is a
