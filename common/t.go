@@ -37,7 +37,7 @@ func (t *MockT) FailNow() {
 	t.failednow = true
 }
 
-func (t *MockT) Log(_ ...any) {
+func (*MockT) Log(_ ...any) {
 	// no-op
 }
 
@@ -45,6 +45,6 @@ func (t *MockT) Error(_ ...any) {
 	t.Fail()
 }
 
-func (t *MockT) Helper() {
+func (*MockT) Helper() {
 	// no-op
 }

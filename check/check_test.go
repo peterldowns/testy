@@ -395,10 +395,10 @@ func TestIn(t *testing.T) {
 	})
 	t.Run("nil equality", func(t *testing.T) {
 		t.Parallel()
-		check.In(t, nil, []interface{}{nil})
+		check.In(t, nil, []any{nil})
 
 		mt := &common.MockT{}
-		check.In(mt, nil, []interface{}{})
+		check.In(mt, nil, []any{})
 		check.True(t, mt.Failed())
 		check.False(t, mt.FailedNow())
 	})
@@ -486,11 +486,11 @@ func TestNotIn(t *testing.T) {
 	})
 	t.Run("nil equality", func(t *testing.T) {
 		t.Parallel()
-		res := check.NotIn(t, nil, []interface{}{})
+		res := check.NotIn(t, nil, []any{})
 		check.True(t, res)
 
 		mt := &common.MockT{}
-		res = check.NotIn(mt, nil, []interface{}{nil})
+		res = check.NotIn(mt, nil, []any{nil})
 		check.False(t, res)
 		check.True(t, mt.Failed())
 		check.False(t, mt.FailedNow())
