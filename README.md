@@ -1,19 +1,47 @@
-
 # 😤 Testy
 
-Testy is a library for writing meaningful and readable tests.
+Testy is a library for writing meaningful, readable, and maintainable tests.
 Testy is typesafe (using generics), based on [go-cmp](#), and designed as an alternative
 to [testify](https://github.com/stretchr/testify), [gotools.test](https://github.com/gotestyourself/gotest.tools), and [is](https://github.com/matryer/is).
 
 Major features:
-- Typesafe, using generics, means that many failures are now caught at compile time,
-  rather than requiring you to run the test suite.
+- Typesafe comparisons mean that when you refactor your code, your tests
+  can be easily updated. Trust the compiler to tell you which tests need
+  to be updated; no more waiting until you run the full test suite to find out
+  that you can't compare an `int` and a `string`.
+- A limited number of methods makes it easier to write tests by constraining your options.
+  If you need a more complicated assertion method, write a helper function and use it
+  yourself. No need to crawl through the testify Github docs and issues to figure out
+  which assertion would be most appropriate.
 - Deep equality testing by default using [go-cmp](https://github.com/google/go-cmp), which
   means equality checks work in a sane way by default (even for `time.Time` objects), and optional
   controls for more complicated situations.
-- Soft *check* (test keeps going) and hard *assert* (test fails instantly) versions of every method
-  gives you full control over which checks are run, in which stages, during your tests.
+- A distinction between *checks* (soft assertions) and *asserts* (hard
+  assertions), and the included structuring helpers, makes it easy to write
+  tests that fail in ways that have more meaningful output.
+  - Have you ever spent time fixing an assertion error in a test, and then after fixing
+    it the next assertion also fails, and then after fixing that, the next one, too? Not
+    a problem if you use testy.
+  - Have you ever changed one thing and seen a test fail with a million different assertions,
+    including complaints about null pointers? Using testy, you can write your tests such
+    that they immediately stop after the first violation of your assumptions.
 - Additional nice-to-have helpers for structuring tests in more readable ways.
+
+## API
+The following methods are available on both `check` and `assert`:
+
+- `True(t, x)` checks if its argument is `true`
+- `False(t, x)` checks if its argument is `false`
+- `Equal(t, want, got)` checks if its arguments are equal using [go-cmp](https://github.com/google/go-cmp)
+- `NotEqual(t, want, got)` checks if its arguments are not equal using [go-cmp](https://github.com/google/go-cmp)
+- `LessThan(t, small, big)` checks if `small < big`
+- `LessThanOrEqual(t, small, big)` checks if `small <= big`
+- `GreaterThan(t, big, small)` checks if `big > small`
+- `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
+- `Error(t, err)` checks if `err != nil`
+- `Nil(t, err)` checks if `err == nil`
+- `In(t, item, slice)` checks if `item in slice`
+- `NotIn(t, item, slice)` checks if `item not in slice`
 
 ```go
 package example_test
@@ -77,20 +105,13 @@ should be able to explore it quite easily using an LSP plugin, reading the code,
 or clicking through the go.dev docs. 
 
 ## Motivation
-Testy helps you write more usable, readable, and meaningful tests. By allowing
-you to determine between *checks* (soft assertions) and *asserts* (hard
-assertions), and providing structuring helpers, you can make debugging much
-easier on your teammates and your future self.
 
-Testy attempts to strike a balance between allowing explicit and meaningful
-tests, encouraging standard golang coding conventions, avoiding implementation
-magic, and minimizing the number of check methods to choose between when writing
-tests.  Here's everything you need to know:
-
-## `check`
-`check` contains methods for checking a condition, marking a test failed if
-the condition is not met.  This is a "soft" style assert, equivalent to the
-methods in `testify/assert` or the `Check` method in `gotest.tools/assert`.
+## `check` methods call `t.Error`
+`check` contains methods for checking a condition, marking the test as failed
+but allowing it to continue running if the condition is not met.  This is a
+"soft" style assert, equivalent to the methods in `testify/assert` or the
+`Check` method in `gotest.tools/assert`.  If a check fails, testy calls
+`t.Error`.
 
 Each `check` method returns a boolean, which is `true` if the check passed, and `false` otherwise. You can use this to conditionally run other logic in your code.
 
@@ -106,11 +127,12 @@ func TestExample(t *testing.T) {
 }
 ```
 
-## `assert`
-`assert` contains methods for checking a condition, failing the test
-immediately if the condition is not met. This is a "hard" or traditional
-assert, equivalent to the methods in `testify/require` or the `Assert` method
-in `gotest.tools/assert`.
+## `assert` methods call `t.Fatal`
+`assert` contains methods for asserting a condition, marking the test as failed
+and immediately exiting the test if the condition is not met. This is a "hard"
+or traditional assert, equivalent to the methods in `testify/require` or the
+`Assert` method in `gotest.tools/assert`. If an assertion fails, testy calls
+`t.Fatal`.
 
 ```go
 func TestExample(t *testing.T) {
@@ -121,23 +143,6 @@ func TestExample(t *testing.T) {
     assert.Equal(f.Name, "peter")
 }
 ```
-
-## Methods
-The following methods are available on both `check` and `assert`:
-
-- `True(t, x)` checks if its argument is `true`
-- `False(t, x)` checks if its argument is `false`
-- `Equal(t, want, got)` checks if its arguments are equal using [go-cmp](https://github.com/google/go-cmp)
-- `NotEqual(t, want, got)` checks if its arguments are not equal using [go-cmp](https://github.com/google/go-cmp)
-- `LessThan(t, small, big)` checks if `small < big`
-- `LessThanOrEqual(t, small, big)` checks if `small <= big`
-- `GreaterThan(t, big, small)` checks if `big > small`
-- `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
-- `Error(t, err)` checks if `err != nil`
-- `Nil(t, err)` checks if `err == nil`
-- `In(t, item, slice)` checks if `item in slice`
-- `NotIn(t, item, slice)` checks if `item not in slice`
-
 
 ## Structuring Helpers
 The `assert` package also provides helpers for structuring your tests and making them more expressive. You can use these helpers to determine which checks are run in parallel, and which checks should halt test execution.
