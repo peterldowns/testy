@@ -1,5 +1,5 @@
 {
-  description = "testy is a library for writing meaningful and readable tests";
+  description = "typesafe (generics) helpers for better golang tests";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
 
@@ -36,9 +36,12 @@
                 gopkgs
                 gopls
                 gotools
+                gotests
+                gomodifytags
+                impl
                 # nix
-                rnix-lsp
                 nixpkgs-fmt
+                nil
                 # xcode: this wrapper symlinks to the host system.
                 # other tools
                 just
