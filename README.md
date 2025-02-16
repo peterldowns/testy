@@ -1,7 +1,7 @@
 # 😤 Testy
 
 Testy is a library for writing meaningful, readable, and maintainable tests.
-Testy is typesafe (using generics), based on [go-cmp](#), and designed as an alternative
+Testy is typesafe (using generics), based on [go-cmp](https://github.com/google/go-cmp), and designed as an alternative
 to [testify](https://github.com/stretchr/testify), [gotools.test](https://github.com/gotestyourself/gotest.tools), and [is](https://github.com/matryer/is).
 
 Major features:
