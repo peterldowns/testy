@@ -1,10 +1,10 @@
 package check
 
 import (
+	"cmp"
 	"fmt"
 
-	"github.com/google/go-cmp/cmp"
-	"golang.org/x/exp/constraints"
+	gocmp "github.com/google/go-cmp/cmp"
 
 	"github.com/peterldowns/testy/common"
 )
@@ -37,9 +37,9 @@ func False(t common.T, x bool) bool {
 //
 // You can change the behavior of the equality checking using the go-cmp/cmp
 // Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
-func Equal[Type any](t common.T, want Type, got Type, opts ...cmp.Option) bool {
+func Equal[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) bool {
 	t.Helper()
-	diff := cmp.Diff(want, got, opts...)
+	diff := gocmp.Diff(want, got, opts...)
 	if diff == "" {
 		return true
 	}
@@ -55,9 +55,9 @@ func Equal[Type any](t common.T, want Type, got Type, opts ...cmp.Option) bool {
 //
 // You can change the behavior of the equality checking using the go-cmp/cmp
 // Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
-func NotEqual[Type any](t common.T, want Type, got Type, opts ...cmp.Option) bool {
+func NotEqual[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) bool {
 	t.Helper()
-	if !cmp.Equal(want, got, opts...) {
+	if !gocmp.Equal(want, got, opts...) {
 		return true
 	}
 	t.Error(fmt.Sprintf("expected want != got\nwant: %+v\n got: %+v", want, got))
@@ -65,7 +65,7 @@ func NotEqual[Type any](t common.T, want Type, got Type, opts ...cmp.Option) boo
 }
 
 // LessThan returns true if small < big, otherwise marks the test as failed and returns false.
-func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) bool {
+func LessThan[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	t.Helper()
 	if small < big {
 		return true
@@ -75,7 +75,7 @@ func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) bool {
 }
 
 // LessThanOrEqual returns true if small <= big, otherwise marks the test as failed and returns false.
-func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type) bool {
+func LessThanOrEqual[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	t.Helper()
 	if small <= big {
 		return true
@@ -85,7 +85,7 @@ func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type)
 }
 
 // GreaterThan returns true if big > small, otherwise marks the test as failed and returns false.
-func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) bool {
+func GreaterThan[Type cmp.Ordered](t common.T, big Type, small Type) bool {
 	t.Helper()
 	if big > small {
 		return true
@@ -95,7 +95,7 @@ func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) boo
 }
 
 // GreaterThanOrEqual returns true if big >= small, otherwise marks the test as failed and returns false.
-func GreaterThanOrEqual[Type constraints.Ordered](t common.T, big Type, small Type) bool {
+func GreaterThanOrEqual[Type cmp.Ordered](t common.T, big Type, small Type) bool {
 	t.Helper()
 	if big >= small {
 		return true
@@ -134,10 +134,10 @@ func NoError(t common.T, err error) bool {
 
 // In returns true if element is in slice, otherwise marks the test as failed
 // and returns false.
-func In[Type any](t common.T, element Type, slice []Type, opts ...cmp.Option) bool {
+func In[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) bool {
 	t.Helper()
 	for _, value := range slice {
-		if cmp.Equal(element, value, opts...) {
+		if gocmp.Equal(element, value, opts...) {
 			return true
 		}
 	}
@@ -147,10 +147,10 @@ func In[Type any](t common.T, element Type, slice []Type, opts ...cmp.Option) bo
 
 // NotIn returns true if element is not in slice, otherwise marks the test as
 // failed and returns false.
-func NotIn[Type any](t common.T, element Type, slice []Type, opts ...cmp.Option) bool {
+func NotIn[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) bool {
 	t.Helper()
 	for _, value := range slice {
-		if cmp.Equal(element, value, opts...) {
+		if gocmp.Equal(element, value, opts...) {
 			t.Error(fmt.Sprintf("expected slice to not contain element\nelement: %+v\n  found: %+v", element, value))
 			return false
 		}
