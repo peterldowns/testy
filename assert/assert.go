@@ -105,6 +105,14 @@ func Nil(t common.T, err error) {
 	}
 }
 
+// NoError passes if err == nil otherwise immediately failing the test.
+//
+// NoError is an alias for [Nil]
+func NoError(t common.T, err error) {
+	t.Helper()
+	Nil(t, err)
+}
+
 // In passes if want is an element of slice, otherwise immediately failing the
 // test.
 func In[Type any](t common.T, want Type, slice []Type, opts ...cmp.Option) {

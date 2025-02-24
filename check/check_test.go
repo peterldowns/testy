@@ -380,6 +380,15 @@ func TestError(t *testing.T) {
 		check.True(t, mt.Failed())
 		check.False(t, mt.FailedNow())
 	})
+	t.Run("noerror", func(t *testing.T) {
+		t.Parallel()
+		check.NoError(t, nil)
+
+		mt := &common.MockT{}
+		check.NoError(mt, fmt.Errorf("new error"))
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
 }
 
 func TestIn(t *testing.T) {

@@ -1,5 +1,8 @@
 # 😤 Testy
 
+![Latest Version](https://badgers.space/badge/latest%20version/v0.0.4/blueviolet?corner_radius=m)
+![Golang](https://badgers.space/badge/golang/1.21+/blue?corner_radius=m)
+
 Testy is a library for writing meaningful, readable, and maintainable tests.
 Testy is typesafe (using generics), based on [go-cmp](https://github.com/google/go-cmp), and designed as an alternative
 to [testify](https://github.com/stretchr/testify), [gotools.test](https://github.com/gotestyourself/gotest.tools), and [is](https://github.com/matryer/is).
@@ -40,6 +43,7 @@ The following methods are available on both `check` and `assert`:
 - `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
 - `Error(t, err)` checks if `err != nil`
 - `Nil(t, err)` checks if `err == nil`
+  - `NoError(t, err)` does the same thing, to make it easier for people switching from testify
 - `In(t, item, slice)` checks if `item in slice`
 - `NotIn(t, item, slice)` checks if `item not in slice`
 
@@ -68,6 +72,7 @@ func TestExample(t *testing.T) {
   check.GreaterThanOrEqual(t, 6, 6)
   check.Error(t, fmt.Errorf("oh no"))
   check.Nil(t, nil)
+  check.NoError(t, nil)
   check.In(t, 4, []int{2, 3, 4, 5})
   check.NotIn(t, "hello", []string{"goodbye", "world"})
 
@@ -83,6 +88,7 @@ func TestExample(t *testing.T) {
   assert.GreaterThanOrEqual(t, 6, 6)
   assert.Error(t, fmt.Errorf("oh no"))
   assert.Nil(t, nil)
+  assert.NoError(t, nil)
   assert.In(t, 4, []int{2, 3, 4, 5})
   assert.NotIn(t, "hello", []string{"goodbye", "world"})
 }
