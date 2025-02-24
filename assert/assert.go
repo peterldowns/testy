@@ -1,9 +1,9 @@
 package assert
 
 import (
-	"golang.org/x/exp/constraints"
+	"cmp"
 
-	"github.com/google/go-cmp/cmp"
+	gocmp "github.com/google/go-cmp/cmp"
 
 	"github.com/peterldowns/testy/check"
 	"github.com/peterldowns/testy/common"
@@ -33,7 +33,7 @@ func False(t common.T, x bool) {
 //
 // You can change the behavior of the equality checking using the go-cmp/cmp
 // Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
-func Equal[Type any](t common.T, want Type, got Type, opts ...cmp.Option) {
+func Equal[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) {
 	t.Helper()
 	if !check.Equal(t, want, got, opts...) {
 		t.FailNow()
@@ -48,7 +48,7 @@ func Equal[Type any](t common.T, want Type, got Type, opts ...cmp.Option) {
 //
 // You can change the behavior of the equality checking using the go-cmp/cmp
 // Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
-func NotEqual[Type any](t common.T, want Type, got Type, opts ...cmp.Option) {
+func NotEqual[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) {
 	t.Helper()
 	if !check.NotEqual(t, want, got, opts...) {
 		t.FailNow()
@@ -56,7 +56,7 @@ func NotEqual[Type any](t common.T, want Type, got Type, opts ...cmp.Option) {
 }
 
 // LessThan passes if small < big, otherwise immediately failing the test.
-func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) {
+func LessThan[Type cmp.Ordered](t common.T, small Type, big Type) {
 	t.Helper()
 	if !check.LessThan(t, small, big) {
 		t.FailNow()
@@ -65,7 +65,7 @@ func LessThan[Type constraints.Ordered](t common.T, small Type, big Type) {
 
 // LessThanOrEqual passes if small <= big, otherwise immediately failing the
 // test.
-func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type) {
+func LessThanOrEqual[Type cmp.Ordered](t common.T, small Type, big Type) {
 	t.Helper()
 	if !check.LessThanOrEqual(t, small, big) {
 		t.FailNow()
@@ -73,7 +73,7 @@ func LessThanOrEqual[Type constraints.Ordered](t common.T, small Type, big Type)
 }
 
 // GreaterThan passes if big > small, otherwise immediately failing the test.
-func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) {
+func GreaterThan[Type cmp.Ordered](t common.T, big Type, small Type) {
 	t.Helper()
 	if !check.GreaterThan(t, big, small) {
 		t.FailNow()
@@ -82,7 +82,7 @@ func GreaterThan[Type constraints.Ordered](t common.T, big Type, small Type) {
 
 // GreaterThanOrEqual passes if big >= small, otherwise immediately failing the
 // test.
-func GreaterThanOrEqual[Type constraints.Ordered](t common.T, big Type, small Type) {
+func GreaterThanOrEqual[Type cmp.Ordered](t common.T, big Type, small Type) {
 	t.Helper()
 	if !check.GreaterThanOrEqual(t, big, small) {
 		t.FailNow()
@@ -115,7 +115,7 @@ func NoError(t common.T, err error) {
 
 // In passes if want is an element of slice, otherwise immediately failing the
 // test.
-func In[Type any](t common.T, want Type, slice []Type, opts ...cmp.Option) {
+func In[Type any](t common.T, want Type, slice []Type, opts ...gocmp.Option) {
 	t.Helper()
 	if !check.In(t, want, slice, opts...) {
 		t.FailNow()
@@ -124,7 +124,7 @@ func In[Type any](t common.T, want Type, slice []Type, opts ...cmp.Option) {
 
 // NotIn passes if want is an not element of slice, otherwise immediately
 // failing the test.
-func NotIn[Type any](t common.T, want Type, slice []Type, opts ...cmp.Option) {
+func NotIn[Type any](t common.T, want Type, slice []Type, opts ...gocmp.Option) {
 	t.Helper()
 	if !check.NotIn(t, want, slice, opts...) {
 		t.FailNow()
