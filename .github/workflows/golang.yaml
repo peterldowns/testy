@@ -30,7 +30,7 @@ jobs:
           cache: true
           cache-dependency-path: go.sum
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v6.5.0
         with:
           install-mode: "binary"
           version: v1.64.5 # matches `golangci-lint version` in nix devshell
