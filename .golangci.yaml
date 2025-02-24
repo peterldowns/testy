@@ -14,7 +14,6 @@ linters-settings:
     default-signifies-exhaustive: true
   nolintlint:
     allow-unused: false
-    allow-leading-space: false
     allow-no-explanation:
       - gochecknoglobals
       - gochecknoinits

@@ -31,7 +31,7 @@
                 # golang
                 delve
                 go-outline
-                go
+                go_1_24
                 golangci-lint
                 gopkgs
                 gopls
