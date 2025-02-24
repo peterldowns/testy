@@ -124,6 +124,14 @@ func Nil(t common.T, err error) bool {
 	return false
 }
 
+// NoError returned true if err == nil, otherwise marks the test as failed and returns false.
+//
+// NoError is an alias for [Nil]
+func NoError(t common.T, err error) bool {
+	t.Helper()
+	return Nil(t, err)
+}
+
 // In returns true if element is in slice, otherwise marks the test as failed
 // and returns false.
 func In[Type any](t common.T, element Type, slice []Type, opts ...cmp.Option) bool {
