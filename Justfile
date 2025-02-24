@@ -8,14 +8,23 @@
 set positional-arguments
 
 # print all available commands by default
-default:
-  just --list
+help:
+  @just --list
 
 # run the test suite
 test *args='./...':
   go test "$@"
 
-# lint the entire codebase
+# lint go and nix
 lint *args:
+  @just lint-go "$@"
+  @just lint-nix
+
+# lint golang
+lint-go *args:
+  golangci-lint config verify --config .golangci.yaml
   golangci-lint run --fix --config .golangci.yaml "$@"
+
+# lint nix
+lint-nix:
   find . -name '*.nix' | xargs nixpkgs-fmt
