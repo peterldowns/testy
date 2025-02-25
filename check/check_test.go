@@ -480,6 +480,45 @@ func TestIn(t *testing.T) {
 	})
 }
 
+func TestNil(t *testing.T) {
+	t.Parallel()
+	t.Run("true", func(t *testing.T) {
+		t.Parallel()
+		check.Nil(t, nil)
+		var intptr *int
+		check.Nil(t, intptr)
+		var val any
+		check.Nil(t, val)
+		var slice []string
+		check.Nil(t, slice)
+	})
+
+	t.Run("false", func(t *testing.T) {
+		t.Parallel()
+
+		mt := &common.MockT{}
+		check.Nil(mt, fmt.Errorf("new error"))
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.Nil(mt, 1)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		check.Nil(mt, "hello")
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+
+		mt = &common.MockT{}
+		slice := []string{}
+		check.Nil(mt, slice)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+}
+
 func TestNotIn(t *testing.T) {
 	t.Parallel()
 	t.Run("int", func(t *testing.T) {

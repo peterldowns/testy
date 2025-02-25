@@ -98,7 +98,7 @@ func Error(t common.T, err error) {
 }
 
 // Nil passes if err == nil, otherwise immediately failing the test.
-func Nil(t common.T, err error) {
+func Nil(t common.T, err any) {
 	t.Helper()
 	if !check.Nil(t, err) {
 		t.FailNow()
