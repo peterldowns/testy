@@ -115,7 +115,19 @@ func Error(t common.T, err error) bool {
 	return false
 }
 
-// Nil returns true if err == nil, otherwise marks the test as failed and returns false.
+// Nil returns true if the value == nil, otherwise marks the test as failed and returns false.
+//
+// Uses reflection because Go doesn't have a type constraint for "nilable".
+// Can return false for the following types:
+//
+//   - error
+//   - pointer
+//   - interface
+//   - map
+//   - slice
+//   - channel
+//   - function
+//   - unsafe.Pointer
 func Nil(t common.T, v any) bool {
 	t.Helper()
 	if isNil(v) {
@@ -125,9 +137,7 @@ func Nil(t common.T, v any) bool {
 	return false
 }
 
-// isNil uses reflection to return whether or not a value
-// is nil, since Go doesn't have a type constraint for "nilable"
-// (error | interface | map | pointer | slice | channel | function)
+// reflection-based implementation
 func isNil(object any) bool {
 	if object == nil {
 		return true
@@ -136,9 +146,13 @@ func isNil(object any) bool {
 	value := reflect.ValueOf(object)
 	switch value.Kind() {
 	case
-		reflect.Chan, reflect.Func,
-		reflect.Interface, reflect.Map,
-		reflect.Ptr, reflect.Slice, reflect.UnsafePointer:
+		reflect.Chan,
+		reflect.Func,
+		reflect.Interface,
+		reflect.Map,
+		reflect.Ptr,
+		reflect.Slice,
+		reflect.UnsafePointer:
 		return value.IsNil()
 	default:
 		return false

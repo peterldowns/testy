@@ -97,7 +97,19 @@ func Error(t common.T, err error) {
 	}
 }
 
-// Nil passes if err == nil, otherwise immediately failing the test.
+// Nil passes if the value == nil, otherwise immediately failing the test.
+//
+// Uses reflection because Go doesn't have a type constraint for "nilable".
+// Can return false for the following types:
+//
+//   - error
+//   - pointer
+//   - interface
+//   - map
+//   - slice
+//   - channel
+//   - function
+//   - unsafe.Pointer
 func Nil(t common.T, err any) {
 	t.Helper()
 	if !check.Nil(t, err) {
