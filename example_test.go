@@ -26,8 +26,10 @@ func TestChecks(t *testing.T) {
 	check.In(t, 4, []int{2, 3, 4, 5})
 	check.NotIn(t, "hello", []string{"goodbye", "world"})
 
-	var nilp *int
-	check.Nil(t, nilp)
+	var nilm map[string]string
+	check.Nil(t, nilm)
+	nilm = map[string]string{"hello": "world"}
+	check.NotNil(t, nilm)
 }
 
 func TestAsserts(t *testing.T) {
@@ -48,6 +50,8 @@ func TestAsserts(t *testing.T) {
 	assert.In(t, 4, []int{2, 3, 4, 5})
 	assert.NotIn(t, "hello", []string{"goodbye", "world"})
 
-	var nilp *int
-	assert.Nil(t, nilp)
+	var nilm map[string]string
+	assert.Nil(t, nilm)
+	nilm = map[string]string{"hello": "world"}
+	assert.NotNil(t, nilm)
 }

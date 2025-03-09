@@ -362,142 +362,6 @@ func TestGreater(t *testing.T) {
 	})
 }
 
-func TestNil(t *testing.T) {
-	t.Parallel()
-
-	t.Run("error", func(t *testing.T) {
-		t.Parallel()
-		var val error
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		val = fmt.Errorf("new error")
-		assert.True(t, val != nil)
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-
-	t.Run("chan", func(t *testing.T) {
-		t.Parallel()
-		var val chan int
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		val = make(chan int)
-		assert.True(t, val != nil)
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-
-	t.Run("func", func(t *testing.T) {
-		t.Parallel()
-		var val func()
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		val = func() {}
-		assert.True(t, val != nil)
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-
-	t.Run("interface", func(t *testing.T) {
-		t.Parallel()
-		var val any
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		val = any("hello")         //nolint:staticcheck // intentional
-		assert.True(t, val != nil) //nolint:staticcheck // intentional
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-
-	t.Run("map", func(t *testing.T) {
-		t.Parallel()
-		var val map[string]int
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		val = map[string]int{}
-		assert.True(t, val != nil)
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-
-	t.Run("pointer", func(t *testing.T) {
-		t.Parallel()
-		var val *int
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		wrapped := 8
-		val = &wrapped
-		assert.True(t, val != nil)
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-
-	t.Run("slice", func(t *testing.T) {
-		t.Parallel()
-		var val []int
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		// empty slice
-		val = []int{}
-		assert.True(t, val != nil)
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-
-		// full slice
-		val = []int{1, 2, 3, 4, 5}
-		assert.True(t, val != nil)
-
-		mt = &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-
-	t.Run("unsafe pointer", func(t *testing.T) {
-		t.Parallel()
-		var val unsafe.Pointer
-		assert.True(t, val == nil)
-		assert.Nil(t, val)
-
-		wrapped := 8
-		val = unsafe.Pointer(&wrapped)
-		assert.True(t, val != nil)
-
-		mt := &common.MockT{}
-		assert.Nil(mt, val)
-		assert.True(t, mt.Failed())
-		assert.True(t, mt.FailedNow())
-	})
-}
-
 func TestError(t *testing.T) {
 	t.Parallel()
 	t.Run("error", func(t *testing.T) {
@@ -696,5 +560,258 @@ func TestNotIn(t *testing.T) {
 		t.Parallel()
 		assert.NotIn(t, 1, []int{})
 		assert.NotIn(t, 1, nil)
+	})
+}
+
+func TestNil(t *testing.T) {
+	t.Parallel()
+
+	t.Run("error", func(t *testing.T) {
+		t.Parallel()
+		var val error
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		val = fmt.Errorf("new error")
+		assert.True(t, val != nil)
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("chan", func(t *testing.T) {
+		t.Parallel()
+		var val chan int
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		val = make(chan int)
+		assert.True(t, val != nil)
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("func", func(t *testing.T) {
+		t.Parallel()
+		var val func()
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		val = func() {}
+		assert.True(t, val != nil)
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("interface", func(t *testing.T) {
+		t.Parallel()
+		var val any
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		val = any("hello")         //nolint:staticcheck // intentional
+		assert.True(t, val != nil) //nolint:staticcheck // intentional
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("map", func(t *testing.T) {
+		t.Parallel()
+		var val map[string]int
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		val = map[string]int{}
+		assert.True(t, val != nil)
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("pointer", func(t *testing.T) {
+		t.Parallel()
+		var val *int
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		wrapped := 8
+		val = &wrapped
+		assert.True(t, val != nil)
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("slice", func(t *testing.T) {
+		t.Parallel()
+		var val []int
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		// empty slice
+		val = []int{}
+		assert.True(t, val != nil)
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+
+		// full slice
+		val = []int{1, 2, 3, 4, 5}
+		assert.True(t, val != nil)
+
+		mt = &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("unsafe pointer", func(t *testing.T) {
+		t.Parallel()
+		var val unsafe.Pointer
+		assert.True(t, val == nil)
+		assert.Nil(t, val)
+
+		wrapped := 8
+		val = unsafe.Pointer(&wrapped)
+		assert.True(t, val != nil)
+
+		mt := &common.MockT{}
+		assert.Nil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+}
+
+func TestNotNil(t *testing.T) {
+	t.Parallel()
+
+	t.Run("error", func(t *testing.T) {
+		t.Parallel()
+		val := fmt.Errorf("new error")
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("error", func(t *testing.T) {
+		t.Parallel()
+		val := make(chan int)
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("func", func(t *testing.T) {
+		t.Parallel()
+		val := func() {}
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("interface", func(t *testing.T) {
+		t.Parallel()
+		val := any("hello")        //nolint:staticassert // intentional
+		assert.True(t, val != nil) //nolint:staticassert // intentional
+		assert.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("map", func(t *testing.T) {
+		t.Parallel()
+		val := map[string]int{}
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("pointer", func(t *testing.T) {
+		t.Parallel()
+		wrapped := 8
+		val := &wrapped
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("slice", func(t *testing.T) {
+		t.Parallel()
+		// empty slice
+		val := []int{}
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		// full slice
+		val = []int{1, 2, 3, 4, 5}
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		// nil
+		val = nil
+		mt := &common.MockT{}
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
+	})
+
+	t.Run("unsafe pointer", func(t *testing.T) {
+		t.Parallel()
+		wrapped := 8
+		val := unsafe.Pointer(&wrapped)
+		assert.True(t, val != nil)
+		assert.NotNil(t, val)
+
+		val = nil
+		mt := &common.MockT{}
+		assert.NotNil(mt, val)
+		assert.True(t, mt.Failed())
+		assert.True(t, mt.FailedNow())
 	})
 }

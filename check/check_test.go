@@ -481,6 +481,91 @@ func TestIn(t *testing.T) {
 	})
 }
 
+func TestNotIn(t *testing.T) {
+	t.Parallel()
+	t.Run("int", func(t *testing.T) {
+		t.Parallel()
+		res := check.NotIn(t, 1, []int{4, 5, 6})
+		check.True(t, res)
+
+		mt := &common.MockT{}
+		res = check.NotIn(mt, 1, []int{1, 2, 3})
+		check.False(t, res)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("nil equality", func(t *testing.T) {
+		t.Parallel()
+		res := check.NotIn(t, nil, []any{})
+		check.True(t, res)
+
+		mt := &common.MockT{}
+		res = check.NotIn(mt, nil, []any{nil})
+		check.False(t, res)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("strings", func(t *testing.T) {
+		t.Parallel()
+		check.NotIn(t, "world", []string{"hello world"})
+
+		mt := &common.MockT{}
+		check.NotIn(mt, "world", []string{"hello", "world"})
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+	t.Run("hidden struct fields with cmp.opts", func(t *testing.T) {
+		t.Parallel()
+		// Equal works with types that have hidden fields, you just need to use a
+		// cmp.Option.
+		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
+		check.NotIn(
+			t,
+			hiddenPerson{Name: "Peter", hidden: true},
+			[]hiddenPerson{
+				{Name: "Peter", hidden: false},
+			},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+
+		mt := &common.MockT{}
+		check.NotIn(
+			mt,
+			customStructWithHiddenField,
+			[]hiddenPerson{
+				customStructWithHiddenField,
+			},
+			cmp.AllowUnexported(hiddenPerson{}),
+		)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+		t.Parallel()
+		t1 := time.Now()
+		check.NotIn(
+			t,
+			t1,
+			[]time.Time{
+				t1.Add(1 * time.Hour),
+			},
+		)
+
+		mt := &common.MockT{}
+		t2 := t1.UTC()
+		check.NotIn(mt, t1, []time.Time{t1, t2})
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("empty slice", func(t *testing.T) {
+		t.Parallel()
+		check.NotIn(t, 1, []int{})
+		check.NotIn(t, 1, nil)
+	})
+}
+
 func TestNil(t *testing.T) {
 	t.Parallel()
 
@@ -617,87 +702,119 @@ func TestNil(t *testing.T) {
 	})
 }
 
-func TestNotIn(t *testing.T) {
+func TestNotNil(t *testing.T) {
 	t.Parallel()
-	t.Run("int", func(t *testing.T) {
+
+	t.Run("error", func(t *testing.T) {
 		t.Parallel()
-		res := check.NotIn(t, 1, []int{4, 5, 6})
-		check.True(t, res)
+		val := fmt.Errorf("new error")
+		check.True(t, val != nil)
+		check.NotNil(t, val)
 
 		mt := &common.MockT{}
-		res = check.NotIn(mt, 1, []int{1, 2, 3})
-		check.False(t, res)
-		check.True(t, mt.Failed())
-		check.False(t, mt.FailedNow())
-	})
-	t.Run("nil equality", func(t *testing.T) {
-		t.Parallel()
-		res := check.NotIn(t, nil, []any{})
-		check.True(t, res)
-
-		mt := &common.MockT{}
-		res = check.NotIn(mt, nil, []any{nil})
-		check.False(t, res)
-		check.True(t, mt.Failed())
-		check.False(t, mt.FailedNow())
-	})
-	t.Run("strings", func(t *testing.T) {
-		t.Parallel()
-		check.NotIn(t, "world", []string{"hello world"})
-
-		mt := &common.MockT{}
-		check.NotIn(mt, "world", []string{"hello", "world"})
-		check.True(t, mt.Failed())
-		check.False(t, mt.FailedNow())
-	})
-	t.Run("hidden struct fields with cmp.opts", func(t *testing.T) {
-		t.Parallel()
-		// Equal works with types that have hidden fields, you just need to use a
-		// cmp.Option.
-		customStructWithHiddenField := hiddenPerson{Name: "Peter", hidden: true}
-		check.NotIn(
-			t,
-			hiddenPerson{Name: "Peter", hidden: true},
-			[]hiddenPerson{
-				{Name: "Peter", hidden: false},
-			},
-			cmp.AllowUnexported(hiddenPerson{}),
-		)
-
-		mt := &common.MockT{}
-		check.NotIn(
-			mt,
-			customStructWithHiddenField,
-			[]hiddenPerson{
-				customStructWithHiddenField,
-			},
-			cmp.AllowUnexported(hiddenPerson{}),
-		)
+		val = nil
+		check.NotNil(mt, val)
 		check.True(t, mt.Failed())
 		check.False(t, mt.FailedNow())
 	})
 
-	t.Run("time.time structs with custom .equals", func(t *testing.T) {
+	t.Run("error", func(t *testing.T) {
 		t.Parallel()
-		t1 := time.Now()
-		check.NotIn(
-			t,
-			t1,
-			[]time.Time{
-				t1.Add(1 * time.Hour),
-			},
-		)
+		val := make(chan int)
+		check.True(t, val != nil)
+		check.NotNil(t, val)
 
 		mt := &common.MockT{}
-		t2 := t1.UTC()
-		check.NotIn(mt, t1, []time.Time{t1, t2})
+		val = nil
+		check.NotNil(mt, val)
 		check.True(t, mt.Failed())
 		check.False(t, mt.FailedNow())
 	})
 
-	t.Run("empty slice", func(t *testing.T) {
+	t.Run("func", func(t *testing.T) {
 		t.Parallel()
-		check.NotIn(t, 1, []int{})
-		check.NotIn(t, 1, nil)
+		val := func() {}
+		check.True(t, val != nil)
+		check.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		check.NotNil(mt, val)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("interface", func(t *testing.T) {
+		t.Parallel()
+		val := any("hello")       //nolint:staticcheck // intentional
+		check.True(t, val != nil) //nolint:staticcheck // intentional
+		check.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		check.NotNil(mt, val)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("map", func(t *testing.T) {
+		t.Parallel()
+		val := map[string]int{}
+		check.True(t, val != nil)
+		check.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		check.NotNil(mt, val)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("pointer", func(t *testing.T) {
+		t.Parallel()
+		wrapped := 8
+		val := &wrapped
+		check.True(t, val != nil)
+		check.NotNil(t, val)
+
+		mt := &common.MockT{}
+		val = nil
+		check.NotNil(mt, val)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("slice", func(t *testing.T) {
+		t.Parallel()
+		// empty slice
+		val := []int{}
+		check.True(t, val != nil)
+		check.NotNil(t, val)
+
+		// full slice
+		val = []int{1, 2, 3, 4, 5}
+		check.True(t, val != nil)
+		check.NotNil(t, val)
+
+		// nil
+		val = nil
+		mt := &common.MockT{}
+		check.NotNil(mt, val)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
+	})
+
+	t.Run("unsafe pointer", func(t *testing.T) {
+		t.Parallel()
+		wrapped := 8
+		val := unsafe.Pointer(&wrapped)
+		check.True(t, val != nil)
+		check.NotNil(t, val)
+
+		val = nil
+		mt := &common.MockT{}
+		check.NotNil(mt, val)
+		check.True(t, mt.Failed())
+		check.False(t, mt.FailedNow())
 	})
 }

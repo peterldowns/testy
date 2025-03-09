@@ -48,6 +48,7 @@ code, or clicking through the go.dev docs.
 - `In(t, item, slice)` checks if `item in slice`
 - `NotIn(t, item, slice)` checks if `item not in slice`
 - `Nil(t, val)` checks if `val == nil` using reflection to support any nilable value.
+- `NotNil(t, val)` checks if `val != nil` using reflection to support any nilable value.
 
 ```go
 package api_test
@@ -78,8 +79,10 @@ func TestChecks(t *testing.T) {
 	check.In(t, 4, []int{2, 3, 4, 5})
 	check.NotIn(t, "hello", []string{"goodbye", "world"})
 
-	var nilp *int
-	check.Nil(t, nilp)
+	var nilm map[string]string
+	check.Nil(t, nilm)
+	nilm = map[string]string{"hello": "world"}
+	check.NotNil(t, nilm)
 }
 
 func TestAsserts(t *testing.T) {
@@ -100,8 +103,10 @@ func TestAsserts(t *testing.T) {
 	assert.In(t, 4, []int{2, 3, 4, 5})
 	assert.NotIn(t, "hello", []string{"goodbye", "world"})
 
-	var nilp *int
-	assert.Nil(t, nilp)
+	var nilm map[string]string
+	assert.Nil(t, nilm)
+	nilm = map[string]string{"hello": "world"}
+	assert.NotNil(t, nilm)
 }
 ```
 
@@ -124,7 +129,7 @@ func TestExample(t *testing.T) {
     var err error
     f, err = ServiceThatGetsAFoo()
     // f is only meaningful if err == nil
-    if check.Nil(t, err) {
+    if check.NoError(t, err) {
         check.Equal(f.Name, "peter")
     }
 }
@@ -142,7 +147,7 @@ func TestExample(t *testing.T) {
     var f *MyFoo
     var err error
     f, err = ServiceThatGetsAFoo()
-    assert.Nil(t, err) // if err != nil, the test will end here
+    assert.NoError(t, err) // if err != nil, the test will end here
     assert.Equal(f.Name, "peter")
 }
 ```
@@ -195,9 +200,9 @@ func TestStructuringHelpers(t *testing.T) {
 
     // This is equivalent to
     _, err := myHelper(baz, bar)
-    assert.Nil(err)
+    assert.NoError(err)
     _, err = anotherF(bar)
-    assert.Nil(err)
+    assert.NoError(err)
 }
 ```
 
