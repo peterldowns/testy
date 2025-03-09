@@ -743,8 +743,8 @@ func TestNotNil(t *testing.T) {
 
 	t.Run("interface", func(t *testing.T) {
 		t.Parallel()
-		val := any("hello")        //nolint:staticassert // intentional
-		assert.True(t, val != nil) //nolint:staticassert // intentional
+		val := any("hello")        //nolint:staticcheck // intentional
+		assert.True(t, val != nil) //nolint:staticcheck // intentional
 		assert.NotNil(t, val)
 
 		mt := &common.MockT{}
