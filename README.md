@@ -43,11 +43,11 @@ code, or clicking through the go.dev docs.
 - `LessThanOrEqual(t, small, big)` checks if `small <= big`
 - `GreaterThan(t, big, small)` checks if `big > small`
 - `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
-- `Error(t, err)` checks if `err != nil`
-- `Nil(t, err)` checks if `err == nil`
-  - `NoError(t, err)` does the same thing, to make it easier for people switching from testify
+- `Error(t, err)` checks if `err == nil`
+- `NoError(t, err)` checks if `err != nil`
 - `In(t, item, slice)` checks if `item in slice`
 - `NotIn(t, item, slice)` checks if `item not in slice`
+- `Nil(t, val)` checks if `val == nil` using reflection to support any nilable value.
 
 ```go
 package api_test
