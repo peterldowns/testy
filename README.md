@@ -9,91 +9,13 @@ to [testify](https://github.com/stretchr/testify), [gotools.test](https://github
 
 Major features:
 - Typesafe comparisons mean that when you refactor your code, your tests
-  can be easily updated. Trust the compiler to tell you which tests need
-  to be updated; no more waiting until you run the full test suite to find out
-  that you can't compare an `int` and a `string`.
+  can be easily updated.
 - A limited number of methods makes it easier to write tests by constraining your options.
-  If you need a more complicated assertion method, write a helper function and use it
-  yourself. No need to crawl through the testify Github docs and issues to figure out
-  which assertion would be most appropriate.
-- Deep equality testing by default using [go-cmp](https://github.com/google/go-cmp), which
-  means equality checks work in a sane way by default (even for `time.Time` objects), and optional
-  controls for more complicated situations.
-- A distinction between *checks* (soft assertions) and *asserts* (hard
-  assertions), and the included structuring helpers, makes it easy to write
-  tests that fail in ways that have more meaningful output.
-  - Have you ever spent time fixing an assertion error in a test, and then after fixing
-    it the next assertion also fails, and then after fixing that, the next one, too? Not
-    a problem if you use testy.
-  - Have you ever changed one thing and seen a test fail with a million different assertions,
-    including complaints about null pointers? Using testy, you can write your tests such
-    that they immediately stop after the first violation of your assumptions.
-- Additional nice-to-have helpers for structuring tests in more readable ways.
-
-## API
-The following methods are available on both `check` and `assert`:
-
-- `True(t, x)` checks if its argument is `true`
-- `False(t, x)` checks if its argument is `false`
-- `Equal(t, want, got)` checks if its arguments are equal using [go-cmp](https://github.com/google/go-cmp)
-- `NotEqual(t, want, got)` checks if its arguments are not equal using [go-cmp](https://github.com/google/go-cmp)
-- `LessThan(t, small, big)` checks if `small < big`
-- `LessThanOrEqual(t, small, big)` checks if `small <= big`
-- `GreaterThan(t, big, small)` checks if `big > small`
-- `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
-- `Error(t, err)` checks if `err != nil`
-- `Nil(t, err)` checks if `err == nil`
-  - `NoError(t, err)` does the same thing, to make it easier for people switching from testify
-- `In(t, item, slice)` checks if `item in slice`
-- `NotIn(t, item, slice)` checks if `item not in slice`
-
-```go
-package example_test
-
-import (
-    "fmt"
-    "testing"
-
-    "github.com/peterldowns/testy/check"
-    "github.com/peterldowns/testy/assert"
-)
-
-func TestExample(t *testing.T) {
-  // If a given check fails, the test will be marked as failed but continue
-  // executing.  All failures are reported when the test stops executing,
-  // either at the end of the test or when someone calls t.FailNow().
-  check.True(t, true)
-  check.False(t, false)
-  check.Equal(t, []string{"hello"}, []string{"hello"})
-  check.NotEqual(t, map[string]int{"hello": 1}, nil)
-  check.LessThan(t, 1, 4)
-  check.LessThanOrEqual(t, 4, 4)
-  check.GreaterThan(t, 8, 6)
-  check.GreaterThanOrEqual(t, 6, 6)
-  check.Error(t, fmt.Errorf("oh no"))
-  check.Nil(t, nil)
-  check.NoError(t, nil)
-  check.In(t, 4, []int{2, 3, 4, 5})
-  check.NotIn(t, "hello", []string{"goodbye", "world"})
-
-  // If a given assert fails, the test will immediately be marked as failed
-  // stop executing, and report all failures.
-  assert.True(t, true)
-  assert.False(t, false)
-  assert.Equal(t, []string{"hello"}, []string{"hello"})
-  assert.NotEqual(t, map[string]int{"hello": 1}, nil)
-  assert.LessThan(t, 1, 4)
-  assert.LessThanOrEqual(t, 4, 4)
-  assert.GreaterThan(t, 8, 6)
-  assert.GreaterThanOrEqual(t, 6, 6)
-  assert.Error(t, fmt.Errorf("oh no"))
-  assert.Nil(t, nil)
-  assert.NoError(t, nil)
-  assert.In(t, 4, []int{2, 3, 4, 5})
-  assert.NotIn(t, "hello", []string{"goodbye", "world"})
-}
-
-```
+- Extendable: if you need a more complicated assertion method, write your own helper functions.
+- Deep equality testing by default using [go-cmp](https://github.com/google/go-cmp).
+- **checks**: soft assertions using `t.Fail`, the test is marked as failed but will continue running.
+- **asserts**: hard assertions using `t.FailNow`, the test is marked as failed and stops immediately.
+- Optional helpers for structuring tests in more readable ways.
 
 ## Install
 
@@ -102,24 +24,104 @@ go get github.com/peterldowns/testy@latest
 ```
 
 ## Documentation
-- [This page, https://github.com/peterldowns/testy](https://github.com/peterldowns/testy)
+- [The github README, https://github.com/peterldowns/testy](https://github.com/peterldowns/testy)
 - [The go.dev docs, pkg.go.dev/github.com/peterldowns/testy](https://pkg.go.dev/github.com/peterldowns/testy)
 
-This page is the primary source for documentation. The code itself is supposed
-to be well-organized, and each function has a meaningful docstring, so you
-should be able to explore it quite easily using an LSP plugin, reading the code,
-or clicking through the go.dev docs. 
+The github README is the primary source for documentation. The code itself is
+supposed to be well-organized, and each function has a meaningful docstring, so
+you should be able to explore it quite easily using an LSP plugin, reading the
+code, or clicking through the go.dev docs. 
 
-## Motivation
 
-## `check` methods call `t.Error`
+## API
+
+- `True(t, x)` checks if `x == true`
+- `False(t, x)` checks if `x == false`
+- `Equal(t, want, got)` checks if its arguments are equal using [go-cmp](https://github.com/google/go-cmp)
+- `NotEqual(t, want, got)` checks if its arguments are not equal using [go-cmp](https://github.com/google/go-cmp)
+- `LessThan(t, small, big)` checks if `small < big`
+- `LessThanOrEqual(t, small, big)` checks if `small <= big`
+- `GreaterThan(t, big, small)` checks if `big > small`
+- `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
+- `Error(t, err)` checks if `err == nil`
+- `NoError(t, err)` checks if `err != nil`
+- `In(t, item, slice)` checks if `item in slice`
+- `NotIn(t, item, slice)` checks if `item not in slice`
+- `Nil(t, val)` checks if `val == nil` using reflection to support any nilable value.
+- `NotNil(t, val)` checks if `val != nil` using reflection to support any nilable value.
+
+```go
+package api_test
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/peterldowns/testy/assert"
+	"github.com/peterldowns/testy/check"
+)
+
+func TestChecks(t *testing.T) {
+	t.Parallel()
+	check.True(t, true)
+	check.False(t, false)
+	check.Equal(t, []string{"hello"}, []string{"hello"})
+	check.NotEqual(t,
+		map[string]int{"hello": 1},
+		map[string]int{"goodbye": 2},
+	)
+	check.LessThan(t, 1, 4)
+	check.LessThanOrEqual(t, 4, 4)
+	check.GreaterThan(t, 8, 6)
+	check.GreaterThanOrEqual(t, 6, 6)
+	check.Error(t, fmt.Errorf("oh no"))
+	check.NoError(t, nil)
+	check.In(t, 4, []int{2, 3, 4, 5})
+	check.NotIn(t, "hello", []string{"goodbye", "world"})
+
+	var nilm map[string]string
+	check.Nil(t, nilm)
+	nilm = map[string]string{"hello": "world"}
+	check.NotNil(t, nilm)
+}
+
+func TestAsserts(t *testing.T) {
+	t.Parallel()
+	assert.True(t, true)
+	assert.False(t, false)
+	assert.Equal(t, []string{"hello"}, []string{"hello"})
+	assert.NotEqual(t,
+		map[string]int{"hello": 1},
+		map[string]int{"goodbye": 2},
+	)
+	assert.LessThan(t, 1, 4)
+	assert.LessThanOrEqual(t, 4, 4)
+	assert.GreaterThan(t, 8, 6)
+	assert.GreaterThanOrEqual(t, 6, 6)
+	assert.Error(t, fmt.Errorf("oh no"))
+	assert.NoError(t, nil)
+	assert.In(t, 4, []int{2, 3, 4, 5})
+	assert.NotIn(t, "hello", []string{"goodbye", "world"})
+
+	var nilm map[string]string
+	assert.Nil(t, nilm)
+	nilm = map[string]string{"hello": "world"}
+	assert.NotNil(t, nilm)
+}
+```
+
+# Details
+
+## `check` methods call `t.Fail`
 `check` contains methods for checking a condition, marking the test as failed
 but allowing it to continue running if the condition is not met.  This is a
 "soft" style assert, equivalent to the methods in `testify/assert` or the
 `Check` method in `gotest.tools/assert`.  If a check fails, testy calls
-`t.Error`.
+`t.Fail`.
 
-Each `check` method returns a boolean, which is `true` if the check passed, and `false` otherwise. You can use this to conditionally run other logic in your code.
+Each `check` method returns a boolean, which is `true` if the check passed, and
+`false` otherwise. You can use this to conditionally run other logic in your
+code.
 
 ```go
 func TestExample(t *testing.T) {
@@ -127,36 +129,43 @@ func TestExample(t *testing.T) {
     var err error
     f, err = ServiceThatGetsAFoo()
     // f is only meaningful if err == nil
-    if check.Nil(t, err) {
+    if check.NoError(t, err) {
         check.Equal(f.Name, "peter")
     }
 }
 ```
 
-## `assert` methods call `t.Fatal`
+## `assert` methods call `t.FailNow`
 `assert` contains methods for asserting a condition, marking the test as failed
 and immediately exiting the test if the condition is not met. This is a "hard"
 or traditional assert, equivalent to the methods in `testify/require` or the
 `Assert` method in `gotest.tools/assert`. If an assertion fails, testy calls
-`t.Fatal`.
+`t.FailNow`.
 
 ```go
 func TestExample(t *testing.T) {
     var f *MyFoo
     var err error
     f, err = ServiceThatGetsAFoo()
-    assert.Nil(t, err) // if err != nil, the test will end here
+    assert.NoError(t, err) // if err != nil, the test will end here
     assert.Equal(f.Name, "peter")
 }
 ```
 
 ## Structuring Helpers
-The `assert` package also provides helpers for structuring your tests and making them more expressive. You can use these helpers to determine which checks are run in parallel, and which checks should halt test execution.
+The `assert` package also provides helpers for structuring your tests and making
+them more expressive. You can use these helpers to determine which checks are
+run in parallel, and which checks should halt test execution.
 
-- `assert.NoFailures(t)` and `assert.NoErrors(t)` will instantly fail the test if any previous `check` has failed,
-or any other code has called `t.Fail()`/`t.Error()` for any reason.
-- `assert.NoFailures(t, thunks...(func()))` will run each thunk function. After each thunk, it will check that no failures have occurred. If they have, the test immediately exits without running any of the following thunks.
-- `assert.NoErrors(t, thunks...(func() error))` will run each thunk function. If the thunk returns an error, or any check failure has occurred, the test immediately exits without running any of the following thunks.
+- `assert.NoFailures(t)` and `assert.NoErrors(t)` will instantly fail the test
+if any previous `check` has failed, or any other code has called
+`t.Fail()`/`t.Error()` for any reason.
+- `assert.NoFailures(t, thunks...(func()))` will run each thunk function. After
+each thunk, it will check that no failures have occurred. If they have, the test
+immediately exits without running any of the following thunks.
+- `assert.NoErrors(t, thunks...(func() error))` will run each thunk function. If
+the thunk returns an error, or any check failure has occurred, the test
+immediately exits without running any of the following thunks.
 
 You can use these to stage your tests and make them more useful.
 
@@ -191,15 +200,16 @@ func TestStructuringHelpers(t *testing.T) {
 
     // This is equivalent to
     _, err := myHelper(baz, bar)
-    assert.Nil(err)
+    assert.NoError(err)
     _, err = anotherF(bar)
-    assert.Nil(err)
+    assert.NoError(err)
 }
 ```
 
 ## More Examples
 
-Beyond the examples presented in this README, see `main_test.go`.
+Beyond the examples presented in this README, please read the code and its tests
+to see `testy` in action.
 
 # FAQ
 

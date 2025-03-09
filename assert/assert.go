@@ -97,20 +97,14 @@ func Error(t common.T, err error) {
 	}
 }
 
-// Nil passes if err == nil, otherwise immediately failing the test.
-func Nil(t common.T, err error) {
-	t.Helper()
-	if !check.Nil(t, err) {
-		t.FailNow()
-	}
-}
-
 // NoError passes if err == nil otherwise immediately failing the test.
 //
 // NoError is an alias for [Nil]
 func NoError(t common.T, err error) {
 	t.Helper()
-	Nil(t, err)
+	if !check.NoError(t, err) {
+		t.FailNow()
+	}
 }
 
 // In passes if want is an element of slice, otherwise immediately failing the
@@ -127,6 +121,22 @@ func In[Type any](t common.T, want Type, slice []Type, opts ...gocmp.Option) {
 func NotIn[Type any](t common.T, want Type, slice []Type, opts ...gocmp.Option) {
 	t.Helper()
 	if !check.NotIn(t, want, slice, opts...) {
+		t.FailNow()
+	}
+}
+
+// Nil passes if the val == nil, otherwise immediately failing the test.
+func Nil(t common.T, val any) {
+	t.Helper()
+	if !check.Nil(t, val) {
+		t.FailNow()
+	}
+}
+
+// NotNil passes if the val != nil, otherwise immediately failing the test.
+func NotNil(t common.T, val any) {
+	t.Helper()
+	if !check.NotNil(t, val) {
 		t.FailNow()
 	}
 }

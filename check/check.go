@@ -3,6 +3,7 @@ package check
 import (
 	"cmp"
 	"fmt"
+	"reflect"
 
 	gocmp "github.com/google/go-cmp/cmp"
 
@@ -114,22 +115,16 @@ func Error(t common.T, err error) bool {
 	return false
 }
 
-// Nil returns true if err == nil, otherwise marks the test as failed and returns false.
-func Nil(t common.T, err error) bool {
-	t.Helper()
-	if err == nil {
-		return true
-	}
-	t.Error(fmt.Sprintf("expected <nil> error, received %v", err))
-	return false
-}
-
 // NoError returned true if err == nil, otherwise marks the test as failed and returns false.
 //
 // NoError is an alias for [Nil]
 func NoError(t common.T, err error) bool {
 	t.Helper()
-	return Nil(t, err)
+	if err == nil {
+		return true
+	}
+	t.Error("expected <nil> error, received %v", err)
+	return false
 }
 
 // In returns true if element is in slice, otherwise marks the test as failed
@@ -156,4 +151,70 @@ func NotIn[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Optio
 		}
 	}
 	return true
+}
+
+// Nil returns true if the value == nil, otherwise marks the test as failed and returns false.
+//
+// Uses reflection because Go doesn't have a type constraint for "nilable".
+// Can return false for the following types:
+//
+//   - error
+//   - pointer
+//   - interface
+//   - map
+//   - slice
+//   - channel
+//   - function
+//   - unsafe.Pointer
+func Nil(t common.T, v any) bool {
+	t.Helper()
+	if isNil(v) {
+		return true
+	}
+	t.Error(fmt.Sprintf("expected <nil>, received %v", v))
+	return false
+}
+
+// NotNil returns true if the value != nil, otherwise marks the test as failed and returns false.
+//
+// Uses reflection because Go doesn't have a type constraint for "nilable".
+// Can return false for the following types:
+//
+//   - error
+//   - pointer
+//   - interface
+//   - map
+//   - slice
+//   - channel
+//   - function
+//   - unsafe.Pointer
+func NotNil(t common.T, v any) bool {
+	t.Helper()
+	if !isNil(v) {
+		return true
+	}
+	t.Error("expected non-<nil> value, received <nil>: %v", v)
+	return false
+}
+
+// reflection-based implementation
+func isNil(object any) bool {
+	if object == nil {
+		return true
+	}
+
+	value := reflect.ValueOf(object)
+	switch value.Kind() {
+	case
+		reflect.Chan,
+		reflect.Func,
+		reflect.Interface,
+		reflect.Map,
+		reflect.Ptr,
+		reflect.Slice,
+		reflect.UnsafePointer:
+		return value.IsNil()
+	default:
+		return false
+	}
 }
