@@ -820,6 +820,7 @@ func TestNotNil(t *testing.T) {
 }
 
 func TestFailureMessages(t *testing.T) {
+	t.Parallel()
 	t.Skipf("remove this skip line to show the failure message of all checks")
 	check.False(t, true)
 	check.True(t, false)
