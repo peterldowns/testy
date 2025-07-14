@@ -818,3 +818,27 @@ func TestNotNil(t *testing.T) {
 		check.False(t, mt.FailedNow())
 	})
 }
+
+func TestFailureMessages(t *testing.T) {
+	t.Skipf("remove this skip line to show the failure message of all checks")
+	check.False(t, true)
+	check.True(t, false)
+	check.NotEqual(t, []string{"hello"}, []string{"hello"})
+	check.Equal(t,
+		map[string]int{"hello": 1},
+		map[string]int{"goodbye": 2},
+	)
+	check.GreaterThan(t, 1, 4)
+	check.GreaterThanOrEqual(t, 4, 4)
+	check.LessThan(t, 8, 6)
+	check.LessThanOrEqual(t, 6, 6)
+	check.NoError(t, fmt.Errorf("oh no"))
+	check.Error(t, nil)
+	check.NotIn(t, 4, []int{2, 3, 4, 5})
+	check.In(t, "hello", []string{"goodbye", "world"})
+
+	var nilm map[string]string
+	check.NotNil(t, nilm)
+	nilm = map[string]string{"hello": "world"}
+	check.Nil(t, nilm)
+}
