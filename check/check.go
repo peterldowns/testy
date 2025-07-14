@@ -44,7 +44,7 @@ func Equal[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) bool
 	if diff == "" {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected want == got\n--- want\n+++ got\n%s", diff))
+	t.Error(fmt.Sprintf("expected want == got\n--- want\n+++ got\n%+v", diff))
 	return false
 }
 
@@ -71,7 +71,7 @@ func LessThan[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	if small < big {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %v < %v", small, big))
+	t.Error(fmt.Sprintf("expected %+v < %+v", small, big))
 	return false
 }
 
@@ -81,7 +81,7 @@ func LessThanOrEqual[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	if small <= big {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %v <= %v", small, big))
+	t.Error(fmt.Sprintf("expected %+v <= %+v", small, big))
 	return false
 }
 
@@ -91,7 +91,7 @@ func GreaterThan[Type cmp.Ordered](t common.T, big Type, small Type) bool {
 	if big > small {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %v > %v", big, small))
+	t.Error(fmt.Sprintf("expected %+v > %+v", big, small))
 	return false
 }
 
@@ -101,7 +101,7 @@ func GreaterThanOrEqual[Type cmp.Ordered](t common.T, big Type, small Type) bool
 	if big >= small {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %v >= %v", big, small))
+	t.Error(fmt.Sprintf("expected %+v >= %+v", big, small))
 	return false
 }
 
@@ -111,7 +111,7 @@ func Error(t common.T, err error) bool {
 	if err != nil {
 		return true
 	}
-	t.Error("expected error, received <nil>")
+	t.Error(fmt.Sprintf("expected non-<nil> error, received %+v", err))
 	return false
 }
 
@@ -123,7 +123,7 @@ func NoError(t common.T, err error) bool {
 	if err == nil {
 		return true
 	}
-	t.Error("expected <nil> error, received", err)
+	t.Error(fmt.Sprintf("expected <nil> error, received %+v", err))
 	return false
 }
 
@@ -171,7 +171,7 @@ func Nil(t common.T, v any) bool {
 	if isNil(v) {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected <nil>, received %v", v))
+	t.Error(fmt.Sprintf("expected <nil>, received %+v", v))
 	return false
 }
 
@@ -193,7 +193,7 @@ func NotNil(t common.T, v any) bool {
 	if !isNil(v) {
 		return true
 	}
-	t.Error("expected non-<nil> value, received <nil>")
+	t.Error(fmt.Sprintf("expected non-<nil> value, received %+v", v))
 	return false
 }
 
