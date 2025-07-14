@@ -123,7 +123,7 @@ func NoError(t common.T, err error) bool {
 	if err == nil {
 		return true
 	}
-	t.Error("expected <nil> error, received %v", err)
+	t.Error("expected <nil> error, received", err)
 	return false
 }
 
@@ -193,7 +193,7 @@ func NotNil(t common.T, v any) bool {
 	if !isNil(v) {
 		return true
 	}
-	t.Error("expected non-<nil> value, received <nil>: %v", v)
+	t.Error("expected non-<nil> value, received <nil>")
 	return false
 }
 
