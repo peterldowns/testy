@@ -13,7 +13,7 @@ Major features:
 - A limited number of methods makes it easier to write tests by constraining your options.
 - Extendable: if you need a more complicated assertion method, write your own helper functions.
 - Deep equality testing by default using [go-cmp](https://github.com/google/go-cmp).
-- **checks**: soft assertions using `t.Fail`, the test is marked as failed but will continue running.
+- **checks**: soft assertions using `t.Error`, the test is marked as failed but will continue running.
 - **asserts**: hard assertions using `t.FailNow`, the test is marked as failed and stops immediately.
 - Optional helpers for structuring tests in more readable ways.
 
@@ -45,8 +45,8 @@ code, or clicking through the go.dev docs.
 - `GreaterThanOrEqual(t, big, small)` checks if `big >= small`
 - `Error(t, err)` checks if `err == nil`
 - `NoError(t, err)` checks if `err != nil`
-- `In(t, item, slice)` checks if `item in slice`
-- `NotIn(t, item, slice)` checks if `item not in slice`
+- `In(t, item, slice)` checks if `item in slice` using [go-cmp](https://github.com/google/go-cmp)
+- `NotIn(t, item, slice)` checks if `item not in slice` using [go-cmp](https://github.com/google/go-cmp)
 - `Nil(t, val)` checks if `val == nil` using reflection to support any nilable value.
 - `NotNil(t, val)` checks if `val != nil` using reflection to support any nilable value.
 
@@ -112,12 +112,12 @@ func TestAsserts(t *testing.T) {
 
 # Details
 
-## `check` methods call `t.Fail`
+## `check` methods call `t.Error`
 `check` contains methods for checking a condition, marking the test as failed
 but allowing it to continue running if the condition is not met.  This is a
 "soft" style assert, equivalent to the methods in `testify/assert` or the
 `Check` method in `gotest.tools/assert`.  If a check fails, testy calls
-`t.Fail`.
+`t.Error`.
 
 Each `check` method returns a boolean, which is `true` if the check passed, and
 `false` otherwise. You can use this to conditionally run other logic in your
