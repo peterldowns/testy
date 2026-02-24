@@ -157,6 +157,9 @@ func NoError(t common.T, err error) bool {
 //
 // Otherwise, the test is marked as failed with t.Error(), this function returns
 // false, and the test continues running.
+//
+// You can change the behavior of the equality checking using the go-cmp/cmp
+// Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
 func In[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) bool {
 	t.Helper()
 	for _, value := range slice {
@@ -172,6 +175,9 @@ func In[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) 
 //
 // Otherwise, the test is marked as failed with t.Error(), this function returns
 // false, and the test continues running.
+//
+// You can change the behavior of the inequality checking using the go-cmp/cmp
+// Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
 func NotIn[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) bool {
 	t.Helper()
 	for _, value := range slice {

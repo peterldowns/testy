@@ -124,6 +124,9 @@ func NoError(t common.T, err error) {
 // In passes if want is an element of slice.
 //
 // Otherwise, the test is immediately failed and stopped with t.FailNow().
+//
+// You can change the behavior of the equality checking using the go-cmp/cmp
+// Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
 func In[Type any](t common.T, want Type, slice []Type, opts ...gocmp.Option) {
 	t.Helper()
 	if !check.In(t, want, slice, opts...) {
@@ -134,6 +137,9 @@ func In[Type any](t common.T, want Type, slice []Type, opts ...gocmp.Option) {
 // NotIn passes if want is not an element of slice.
 //
 // Otherwise, the test is immediately failed and stopped with t.FailNow().
+//
+// You can change the behavior of the inequality checking using the go-cmp/cmp
+// Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
 func NotIn[Type any](t common.T, want Type, slice []Type, opts ...gocmp.Option) {
 	t.Helper()
 	if !check.NotIn(t, want, slice, opts...) {
