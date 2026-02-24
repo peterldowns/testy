@@ -52,7 +52,7 @@ func Equal[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) bool
 	if diff == "" {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected want == got\n--- want\n+++ got\n%+v", diff))
+	t.Error(fmt.Sprintf("expected want == got\n--- want\n+++ got\n%#v", diff))
 	return false
 }
 
@@ -71,7 +71,7 @@ func NotEqual[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) b
 	if !gocmp.Equal(want, got, opts...) {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected want != got\nwant: %+v\n got: %+v", want, got))
+	t.Error(fmt.Sprintf("expected want != got\nwant: %#v\n got: %#v", want, got))
 	return false
 }
 
@@ -84,7 +84,7 @@ func LessThan[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	if small < big {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %+v < %+v", small, big))
+	t.Error(fmt.Sprintf("expected %#v < %#v", small, big))
 	return false
 }
 
@@ -97,7 +97,7 @@ func LessThanOrEqual[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	if small <= big {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %+v <= %+v", small, big))
+	t.Error(fmt.Sprintf("expected %#v <= %#v", small, big))
 	return false
 }
 
@@ -110,7 +110,7 @@ func GreaterThan[Type cmp.Ordered](t common.T, big Type, small Type) bool {
 	if big > small {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %+v > %+v", big, small))
+	t.Error(fmt.Sprintf("expected %#v > %#v", big, small))
 	return false
 }
 
@@ -123,7 +123,7 @@ func GreaterThanOrEqual[Type cmp.Ordered](t common.T, big Type, small Type) bool
 	if big >= small {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected %+v >= %+v", big, small))
+	t.Error(fmt.Sprintf("expected %#v >= %#v", big, small))
 	return false
 }
 
@@ -136,7 +136,7 @@ func Error(t common.T, err error) bool {
 	if err != nil {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected non-<nil> error, received %+v", err))
+	t.Error(fmt.Sprintf("expected non-<nil> error, received %#v", err))
 	return false
 }
 
@@ -149,7 +149,7 @@ func NoError(t common.T, err error) bool {
 	if err == nil {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected <nil> error, received %+v", err))
+	t.Error(fmt.Sprintf("expected <nil> error, received %#v", err))
 	return false
 }
 
@@ -167,7 +167,7 @@ func In[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) 
 			return true
 		}
 	}
-	t.Error(fmt.Sprintf("expected slice to contain element:\nelement: %+v\n", element))
+	t.Error(fmt.Sprintf("expected slice to contain element:\nelement: %#v\n", element))
 	return false
 }
 
@@ -182,7 +182,7 @@ func NotIn[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Optio
 	t.Helper()
 	for _, value := range slice {
 		if gocmp.Equal(element, value, opts...) {
-			t.Error(fmt.Sprintf("expected slice to not contain element\nelement: %+v\n  found: %+v", element, value))
+			t.Error(fmt.Sprintf("expected slice to not contain element\nelement: %#v\n  found: %#v", element, value))
 			return false
 		}
 	}
@@ -210,7 +210,7 @@ func Nil(t common.T, val any) bool {
 	if isNil(val) {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected <nil>, received %+v", val))
+	t.Error(fmt.Sprintf("expected <nil>, received %#v", val))
 	return false
 }
 
@@ -235,7 +235,7 @@ func NotNil(t common.T, v any) bool {
 	if !isNil(v) {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected non-<nil> value, received %+v", v))
+	t.Error(fmt.Sprintf("expected non-<nil> value, received %#v", v))
 	return false
 }
 
