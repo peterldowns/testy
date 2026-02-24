@@ -35,9 +35,5 @@
   },
   "[go]": {
     "editor.formatOnSave": true
-  },
-  "nix.formatterPath": "nixpkgs-fmt",
-  "[nix]": {
-    "editor.formatOnSave": true
   }
 }
