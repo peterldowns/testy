@@ -297,9 +297,6 @@ things about Go is that it does, with the `t.Fail()`/`t.Error()` methods of its 
 ## How can I contribute?
 
 Testy is a standard golang project, you'll need a working golang environment.
-If you're of the nix persuasion, this repo comes with a flakes-compatible
-development shell that you can enter with `nix develop` (flakes) or `nix-shell`
-(standard).
 
 If you use VSCode, the repo comes with suggested extensions and settings.
 
