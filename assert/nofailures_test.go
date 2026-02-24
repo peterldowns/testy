@@ -133,6 +133,33 @@ func TestNoFailuresCallsThunks(t *testing.T) {
 	})
 }
 
+func TestNoFailuresSkipsThunksIfAlreadyErrored(t *testing.T) {
+	t.Parallel()
+	called := false
+	mt := &common.MockT{}
+	mt.Error()
+	assert.NoFailures(mt, func() {
+		called = true
+	})
+	check.True(t, mt.Failed())
+	check.True(t, mt.FailedNow())
+	check.False(t, called)
+}
+
+func TestNoErrorsSkipsThunksIfAlreadyErrored(t *testing.T) {
+	t.Parallel()
+	called := false
+	mt := &common.MockT{}
+	mt.Error()
+	assert.NoErrors(mt, func() error {
+		called = true
+		return nil
+	})
+	check.True(t, mt.Failed())
+	check.True(t, mt.FailedNow())
+	check.False(t, called)
+}
+
 func TestNoErrorsCallsThunks(t *testing.T) {
 	t.Parallel()
 	t.Run("no failures", func(t *testing.T) {
