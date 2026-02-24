@@ -10,7 +10,10 @@ import (
 	"github.com/peterldowns/testy/common"
 )
 
-// True returns true if x == true, otherwise marks the test as failed and returns false.
+// True passes and returns true if x == true.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func True(t common.T, x bool) bool {
 	t.Helper()
 	if x {
@@ -20,7 +23,10 @@ func True(t common.T, x bool) bool {
 	return false
 }
 
-// False returns true if x == false, otherwise marks the test as failed and returns false.
+// False passes and returns true if x == false.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func False(t common.T, x bool) bool {
 	t.Helper()
 	if !x {
@@ -30,11 +36,13 @@ func False(t common.T, x bool) bool {
 	return false
 }
 
-// Equal returns true if want == got, otherwise marks the test as failed and returns false.
+// Equal passes and returns true if want == got.
 //
-// This is a typesafe check for inequality using go-cmp, allowing arguments only
-// of the same type to be compared. Most of the time, this is the
-// equality-checking method that you want.
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
+//
+// This is a typesafe check for equality using go-cmp, allowing arguments only
+// of the same type to be compared.
 //
 // You can change the behavior of the equality checking using the go-cmp/cmp
 // Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
@@ -48,13 +56,15 @@ func Equal[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) bool
 	return false
 }
 
-// NotEqual returns true if want != got, otherwise marks the test as failed and returns false.
+// NotEqual passes and returns true if want != got.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 //
 // This is a typesafe check for inequality using go-cmp, allowing arguments only
-// of the same type to be compared. Most of the time, this is the
-// inequality-checking method that you want.
+// of the same type to be compared.
 //
-// You can change the behavior of the equality checking using the go-cmp/cmp
+// You can change the behavior of the inequality checking using the go-cmp/cmp
 // Options system. For more information, see [the go-cmp documentation](https://pkg.go.dev/github.com/google/go-cmp/cmp#Equal).
 func NotEqual[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) bool {
 	t.Helper()
@@ -65,7 +75,10 @@ func NotEqual[Type any](t common.T, want Type, got Type, opts ...gocmp.Option) b
 	return false
 }
 
-// LessThan returns true if small < big, otherwise marks the test as failed and returns false.
+// LessThan passes and returns true if small < big.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func LessThan[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	t.Helper()
 	if small < big {
@@ -75,7 +88,10 @@ func LessThan[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	return false
 }
 
-// LessThanOrEqual returns true if small <= big, otherwise marks the test as failed and returns false.
+// LessThanOrEqual passes and returns true if small <= big.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func LessThanOrEqual[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	t.Helper()
 	if small <= big {
@@ -85,7 +101,10 @@ func LessThanOrEqual[Type cmp.Ordered](t common.T, small Type, big Type) bool {
 	return false
 }
 
-// GreaterThan returns true if big > small, otherwise marks the test as failed and returns false.
+// GreaterThan passes and returns true if big > small.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func GreaterThan[Type cmp.Ordered](t common.T, big Type, small Type) bool {
 	t.Helper()
 	if big > small {
@@ -95,7 +114,10 @@ func GreaterThan[Type cmp.Ordered](t common.T, big Type, small Type) bool {
 	return false
 }
 
-// GreaterThanOrEqual returns true if big >= small, otherwise marks the test as failed and returns false.
+// GreaterThanOrEqual passes and returns true if big >= small.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func GreaterThanOrEqual[Type cmp.Ordered](t common.T, big Type, small Type) bool {
 	t.Helper()
 	if big >= small {
@@ -105,7 +127,10 @@ func GreaterThanOrEqual[Type cmp.Ordered](t common.T, big Type, small Type) bool
 	return false
 }
 
-// Error returns true if err != nil, otherwise marks the test as failed and returns false.
+// Error passes and returns true if err != nil.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func Error(t common.T, err error) bool {
 	t.Helper()
 	if err != nil {
@@ -115,9 +140,10 @@ func Error(t common.T, err error) bool {
 	return false
 }
 
-// NoError returned true if err == nil, otherwise marks the test as failed and returns false.
+// NoError passes and returns true if err == nil
 //
-// NoError is an alias for [Nil]
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func NoError(t common.T, err error) bool {
 	t.Helper()
 	if err == nil {
@@ -127,8 +153,10 @@ func NoError(t common.T, err error) bool {
 	return false
 }
 
-// In returns true if element is in slice, otherwise marks the test as failed
-// and returns false.
+// In passes and returns true if want is an element of slice.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func In[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) bool {
 	t.Helper()
 	for _, value := range slice {
@@ -140,8 +168,10 @@ func In[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) 
 	return false
 }
 
-// NotIn returns true if element is not in slice, otherwise marks the test as
-// failed and returns false.
+// NotIn passes and returns true if want is not an element of slice.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 func NotIn[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Option) bool {
 	t.Helper()
 	for _, value := range slice {
@@ -153,7 +183,10 @@ func NotIn[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Optio
 	return true
 }
 
-// Nil returns true if the value == nil, otherwise marks the test as failed and returns false.
+// Nil passes and returns true if val == nil.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 //
 // Uses reflection because Go doesn't have a type constraint for "nilable".
 // Can return false for the following types:
@@ -166,16 +199,19 @@ func NotIn[Type any](t common.T, element Type, slice []Type, opts ...gocmp.Optio
 //   - channel
 //   - function
 //   - unsafe.Pointer
-func Nil(t common.T, v any) bool {
+func Nil(t common.T, val any) bool {
 	t.Helper()
-	if isNil(v) {
+	if isNil(val) {
 		return true
 	}
-	t.Error(fmt.Sprintf("expected <nil>, received %+v", v))
+	t.Error(fmt.Sprintf("expected <nil>, received %+v", val))
 	return false
 }
 
-// NotNil returns true if the value != nil, otherwise marks the test as failed and returns false.
+// NotNil passes and returns true if val != nil.
+//
+// Otherwise, the test is marked as failed with t.Error(), this function returns
+// false, and the test continues running.
 //
 // Uses reflection because Go doesn't have a type constraint for "nilable".
 // Can return false for the following types:
